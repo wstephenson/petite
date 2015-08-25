@@ -1,7 +1,7 @@
 pico-8 cartridge // http://www.pico-8.com
 version 4
 __lua__
--- vim: set ft=Lua: 
+-- vim: set ft=lua: 
 -- spinning ship; using picoracer-2048 code
 demo={}
 function demo:init()
@@ -11,7 +11,7 @@ function demo:init()
  self.player=p
 end
 function demo:update()
- self.player.angle+=0.05
+ self.player.angle+=0.01
 end
 function demo:draw()
  local player=self.player
@@ -30,14 +30,15 @@ function create_ship(level)
 		speed=0,
 		accel=0,
 		color=8,
-		collision=0
+		collision=0,
 	}
 	ship.controls = {
 	}
 	ship.verts = {
-		vec(-4,-3),
-		vec(4, 0),
-		vec(-4, 3)
+		vec(7,10),
+		vec(20,-10),
+		vec(-20,-10),
+		vec(-7,10)
 	}
 	ship.get_poly = function(self)
 		return fmap(self.verts,function(i) return rotate_point(self.x+i.x,self.y+i.y,self.angle,self.x,self.y) end)
@@ -108,13 +109,14 @@ function create_ship(level)
 		local angle = self.angle
 		local color = self.color
 		local v = fmap(self.verts,function(i) return rotate_point(x+i.x,y+i.y,angle,x,y) end)
-		local a = v[1]
-		local b = v[2]
-		local c = v[3]
-		local boost = self.boost
-		linevec(a,b,color)
-		linevec(b,c,color)
-		linevec(c,a,color)
+		draw_poly(v,color)
+		--local a = v[1]
+		--local b = v[2]
+		--local c = v[3]
+		--local boost = self.boost
+		--linevec(a,b,color)
+		--linevec(b,c,color)
+		--linevec(c,a,color)
 	end
 
 	return ship
@@ -140,6 +142,17 @@ end
 
 function linevec(a,b,col)
 	line(a.x,a.y,b.x,b.y,col)
+end
+
+function draw_poly(points,col)
+	print(count(points))
+	for i=1,count(points) do
+		if i<count(points) then
+			linevec(points[i],points[i+1],col)
+		else
+			linevec(points[i],points[1],col)
+		end
+	end
 end
 
 function _init()
