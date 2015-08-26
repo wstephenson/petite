@@ -11,7 +11,16 @@ function demo:init()
  self.player=p
 end
 function demo:update()
- self.player.angle+=0.01
+	-- enter input
+	local player = self.player
+	if player then
+		player.controls.left = btn(0)
+		player.controls.right = btn(1)
+		player.controls.action = btn(4)
+		player.controls.accel = btn(2)
+		player.controls.brake = btn(3)
+	end
+	player:update()
 end
 function demo:draw()
  local player=self.player
@@ -121,6 +130,13 @@ function create_ship(level)
 	end
 
 	return ship
+end
+
+function mysqrt(x)
+	if x <= 0 then return 0 end
+	local r = sqrt(x)
+	if r < 0 then return 32768 end
+	return r
 end
 
 function fmap(objs,func)
