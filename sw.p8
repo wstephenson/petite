@@ -35,10 +35,11 @@ function create_ship(level)
 	ship.controls = {
 	}
 	ship.verts = {
-		vec(7,10),
-		vec(20,-10),
-		vec(-20,-10),
-		vec(-7,10)
+		vec(10,7),
+		vec(-10,16),
+		vec(-10,-16),
+		vec(10,-7)
+
 	}
 	ship.get_poly = function(self)
 		return fmap(self.verts,function(i) return rotate_point(self.x+i.x,self.y+i.y,self.angle,self.x,self.y) end)
