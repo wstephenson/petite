@@ -146,7 +146,6 @@ function linevec(a,b,col)
 end
 
 function draw_poly(points,col)
-	print(count(points))
 	for i=1,count(points) do
 		if i<count(points) then
 			linevec(points[i],points[i+1],col)
