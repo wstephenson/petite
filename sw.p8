@@ -10,7 +10,12 @@ torp_speed=5
 function demo:init()
  self.objects={}
  local p=create_ship(self)
- add(self.object,p)
+ local q=create_ship(self)
+ add(self.objects,p)
+ add(self.objects,q)
+ q.color=12
+ q.x=75
+ q.y=50
  self.player=p
 end
 function demo:update()
@@ -57,7 +62,10 @@ end
 function demo:draw()
  local player=self.player
  cls()
- player:draw()
+ for o in all(self.objects) do
+  o:draw()
+ end
+ --player:draw()
  for l in all(lasers) do
   local ox=l.origin.x
   local oy=l.origin.y
