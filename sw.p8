@@ -17,7 +17,7 @@ function demo:update()
 		player.controls.left = btn(0)
 		player.controls.right = btn(1)
 		player.controls.action = btn(4)
-		player.controls.accel = btn(2)
+		player.controls.thrust = btn(2)
 		player.controls.brake = btn(3)
 	end
 	player:update()
@@ -38,9 +38,10 @@ function create_ship(level)
 		angle=0,
 		speed=0,
 		accel=0,
-  thrust=0.08,
-  revthrust=0.04,
-  yaw=0.0225,
+  thrust=0.6,
+  revthrust=0.3,
+  yaw=0.1,
+  maxv=4,
 		color=7,
 		collision=0,
 	}
@@ -67,12 +68,13 @@ function create_ship(level)
 		local accel = self.accel
 		local controls = self.controls
 
-		if controls.accel then
-			accel+=self.thrust*0.3
-		else
-			accel*=0.98
+		if controls.thrust then
+ 		local speed = mysqrt(xv*xv+yv*yv)
+   if(speed<self.maxv) then
+   	xv+=ax*self.thrust
+    yv+=ay*self.thrust
+   end
 		end
-		local speed = mysqrt(xv*xv+yv*yv)
 		-- accelerate
 		if controls.left then angle+=self.yaw*0.3 end
 		if controls.right then angle-=self.yaw*0.3 end
@@ -94,8 +96,11 @@ function create_ship(level)
 --			if sb_right then
 --				angle -= speed*0.0009
 --			end
-			xv*=ax*0.95
-			yv*=ax*0.95
+ 		local speed = mysqrt(xv*xv+yv*yv)
+   if(speed<self.maxv) then
+				xv-=ax*self.revthrust
+				yv-=ay*self.revthrust
+			end
 		end
 		accel=min(accel,self.boosting and 3 or 2)
 		xv+=ax*accel
@@ -104,8 +109,8 @@ function create_ship(level)
 		x+=xv*0.3
 		y+=yv*0.3
 
-		xv*=0.9
-		yv*=0.9
+		xv*=0.99
+		yv*=0.99
 
 		-- update self attrs
 		self.x = x
