@@ -44,6 +44,10 @@ function create_ship(level)
   maxv=4,
 		color=7,
 		collision=0,
+  laser_ttl=0,
+  laser_range=20,
+  actions={'l'},
+  curr_action=1
 	}
 	ship.controls = {
 	}
@@ -111,7 +115,9 @@ function create_ship(level)
 
 		xv*=0.99
 		yv*=0.99
-
+  if(controls.action and self.actions[self.curr_action] == 'l') then
+    self.laser_ttl=5
+  end 
 		-- update self attrs
 		self.x = x
 		self.y = y
@@ -128,6 +134,10 @@ function create_ship(level)
 		local color = self.color
 		local v = fmap(self.verts,function(i) return rotate_point(x+i.x,y+i.y,angle,x,y) end)
 		draw_poly(v,color)
+  if(self.laser_ttl>0) then
+   line(x,y,x+self.laser_range*cos(angle),y+self.laser_range*sin(angle),8)
+   self.laser_ttl-=1
+  end
 	end
 
 	return ship
