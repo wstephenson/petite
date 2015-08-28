@@ -38,16 +38,16 @@ function create_ship(level)
 		angle=0,
 		speed=0,
 		accel=0,
-		color=8,
+		color=7,
 		collision=0,
 	}
 	ship.controls = {
 	}
 	ship.verts = {
-		vec(10,7),
-		vec(-10,16),
-		vec(-10,-16),
-		vec(10,-7)
+		vec(2.5,2),
+		vec(-2.5,4),
+		vec(-2.5,-4),
+		vec(2.5,-2)
 
 	}
 	ship.get_poly = function(self)
