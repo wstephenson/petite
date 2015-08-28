@@ -52,7 +52,8 @@ function demo:draw()
   line(ox,oy,ox+l.range*cos(l.angle),oy+l.range*sin(l.angle),l.color)
  end
  for t in all(torps) do
-  rect(t.x,t.y,t.x+1,t.y+1,11)
+  line(t.x,t.y,t.x+1.5*cos(t.angle-0.45),t.y+1.5*sin(t.angle-0.45),9)
+  line(t.x,t.y,t.x+1.5*cos(t.angle+0.45),t.y+1.5*sin(t.angle+0.45),9)
  end
  print("<"..player.actions[player.curr_action]..'>',10)
 end
