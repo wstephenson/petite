@@ -27,11 +27,17 @@ function demo:update()
 	player:update()
  for l in all(lasers) do
  	age_transient(l,lasers)
+  for o in all(objects) do
+    check_laser_hit(l,o)
+  end
  end
  for t in all(torps) do 
-	 age_transient(t,torps)
-	 t.x+=t.xv
-	 t.y+=t.yv
+  age_transient(t,torps)
+  t.x+=t.xv
+  t.y+=t.yv
+  for o in all(objects) do
+   check_torp_hit(t,o)
+		end
 	end
 end
 
@@ -40,6 +46,12 @@ function age_transient(transient,array)
   if transient.ttl < 0 then
    del(array,transient)
   end
+end
+
+function check_laser_hit(laser,object)
+end
+
+function check_torp_hit(torp,object)
 end
 
 function demo:draw()
