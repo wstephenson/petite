@@ -120,13 +120,6 @@ function create_ship(level)
 		local color = self.color
 		local v = fmap(self.verts,function(i) return rotate_point(x+i.x,y+i.y,angle,x,y) end)
 		draw_poly(v,color)
-		--local a = v[1]
-		--local b = v[2]
-		--local c = v[3]
-		--local boost = self.boost
-		--linevec(a,b,color)
-		--linevec(b,c,color)
-		--linevec(c,a,color)
 	end
 
 	return ship
