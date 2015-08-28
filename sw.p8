@@ -80,22 +80,22 @@ function create_ship(level)
 		local sb_left
 		local sb_right
 		if controls.brake then
-			if controls.left then
-				sb_left = true
-			elseif controls.right then
-				sb_right = true
-			else
-				sb_left = true
-				sb_right = true
-			end
-			if sb_left then
-				angle += speed*0.0009
-			end
-			if sb_right then
-				angle -= speed*0.0009
-			end
-			xv*=0.95
-			yv*=0.95
+--			if controls.left then
+--				sb_left = true
+--			elseif controls.right then
+--				sb_right = true
+--			else
+--				sb_left = true
+--				sb_right = true
+--			end
+--			if sb_left then
+--				angle += speed*0.0009
+--			end
+--			if sb_right then
+--				angle -= speed*0.0009
+--			end
+			xv*=ax*0.95
+			yv*=ax*0.95
 		end
 		accel=min(accel,self.boosting and 3 or 2)
 		xv+=ax*accel
