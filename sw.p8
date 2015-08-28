@@ -5,6 +5,7 @@ __lua__
 -- spinning ship; using picoracer-2048 code
 lasers={}
 demo={}
+torps={}
 function demo:init()
  self.objects={}
  local p=create_ship(self)
@@ -17,18 +18,29 @@ function demo:update()
 	if player then
 		player.controls.left = btn(0)
 		player.controls.right = btn(1)
-		player.controls.action = btn(4)
+		player.controls.action = btnp(4)
+		player.controls.select = btnp(5)
 		player.controls.thrust = btn(2)
 		player.controls.brake = btn(3)
 	end
 	player:update()
  for l in all(lasers) do
-  l.ttl-=1
-  if l.ttl < 0 then
-   del(lasers,l)
-  end
- end 
+ 	age_transient(l,lasers)
+ end
+ for t in all(torps) do 
+	 age_transient(t,torps)
+	 t.x+=t.xv
+	 t.y+=t.yv
+	end
 end
+
+function age_transient(transient,array)	
+  transient.ttl-=1
+  if transient.ttl < 0 then
+   del(array,transients)
+  end
+end
+
 function demo:draw()
  local player=self.player
  cls()
@@ -38,6 +50,10 @@ function demo:draw()
   local oy=l.origin.y
   line(ox,oy,ox+l.range*cos(l.angle),oy+l.range*sin(l.angle),l.color)
  end
+ for t in all(torps) do
+  rect(t.x,t.y,t.x+1,t.y+1,11)
+ end
+ print("<"..player.actions[player.curr_action]..'>',10)
 end
  
 function create_ship(level)
@@ -58,7 +74,7 @@ function create_ship(level)
 		collision=0,
   laser_ttl=0,
   laser_range=20,
-  actions={'l'},
+  actions={"l","m"},
   curr_action=1
 	}
 	ship.controls = {
@@ -127,9 +143,18 @@ function create_ship(level)
 
 		xv*=0.99
 		yv*=0.99
-  if(controls.action and self.actions[self.curr_action] == 'l') then
-   add(lasers,{origin=ship,range=self.laser_range,angle=self.angle,color=8,ttl=5})
-  end 
+		if(controls.action) then
+ 	 if(self.actions[self.curr_action] == 'l') then
+  	 add(lasers,{origin=ship,range=self.laser_range,angle=self.angle,color=8,ttl=5})
+  	end
+  	if(self.actions[self.curr_action] == 'm') then
+  	 add(torps,{x=self.x,y=self.y,angle=self.angle,xv=self.xv,yv=self.yv,ttl=30}) 
+  	end
+  end
+  if(controls.select)then
+  	self.curr_action+=1
+  	if(self.curr_action>count(self.actions)) self.curr_action=1
+  end	
 		-- update self attrs
 		self.x = x
 		self.y = y
