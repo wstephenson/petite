@@ -38,6 +38,9 @@ function create_ship(level)
 		angle=0,
 		speed=0,
 		accel=0,
+  thrust=0.08,
+  revthrust=0.04,
+  yaw=0.0225,
 		color=7,
 		collision=0,
 	}
@@ -65,14 +68,14 @@ function create_ship(level)
 		local controls = self.controls
 
 		if controls.accel then
-			accel+=0.08*0.3
+			accel+=self.thrust*0.3
 		else
 			accel*=0.98
 		end
 		local speed = mysqrt(xv*xv+yv*yv)
 		-- accelerate
-		if controls.left then angle+=0.0225*0.3 end
-		if controls.right then angle-=0.0225*0.3 end
+		if controls.left then angle+=self.yaw*0.3 end
+		if controls.right then angle-=self.yaw*0.3 end
 		-- brake
 		local sb_left
 		local sb_right
