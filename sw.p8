@@ -3,6 +3,7 @@ version 4
 __lua__
 -- vim: set ft=lua ts=1 sw=2 et: 
 -- spinning ship; using picoracer-2048 code
+lasers={}
 demo={}
 function demo:init()
  self.objects={}
@@ -21,11 +22,22 @@ function demo:update()
 		player.controls.brake = btn(3)
 	end
 	player:update()
+ for l in all(lasers) do
+  l.ttl-=1
+  if l.ttl < 0 then
+   del(lasers,l)
+  end
+ end 
 end
 function demo:draw()
  local player=self.player
  cls()
  player:draw()
+ for l in all(lasers) do
+  local ox=l.origin.x
+  local oy=l.origin.y
+  line(ox,oy,ox+l.range*cos(l.angle),oy+l.range*sin(l.angle),l.color)
+ end
 end
  
 function create_ship(level)
@@ -116,7 +128,7 @@ function create_ship(level)
 		xv*=0.99
 		yv*=0.99
   if(controls.action and self.actions[self.curr_action] == 'l') then
-    self.laser_ttl=5
+   add(lasers,{origin=ship,range=self.laser_range,angle=self.angle,color=8,ttl=5})
   end 
 		-- update self attrs
 		self.x = x
@@ -134,10 +146,6 @@ function create_ship(level)
 		local color = self.color
 		local v = fmap(self.verts,function(i) return rotate_point(x+i.x,y+i.y,angle,x,y) end)
 		draw_poly(v,color)
-  if(self.laser_ttl>0) then
-   line(x,y,x+self.laser_range*cos(angle),y+self.laser_range*sin(angle),8)
-   self.laser_ttl-=1
-  end
 	end
 
 	return ship
