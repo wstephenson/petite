@@ -1,7 +1,7 @@
 pico-8 cartridge // http://www.pico-8.com
 version 4
 __lua__
--- vim: set ft=lua: 
+-- vim: set ft=lua ts=1 sw=2 et: 
 -- spinning ship; using picoracer-2048 code
 demo={}
 function demo:init()
