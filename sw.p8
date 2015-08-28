@@ -6,6 +6,7 @@ __lua__
 lasers={}
 demo={}
 torps={}
+torp_speed=5
 function demo:init()
  self.objects={}
  local p=create_ship(self)
@@ -143,14 +144,16 @@ function create_ship(level)
 
 		xv*=0.99
 		yv*=0.99
+		-- actions (lasers,torps)
 		if(controls.action) then
  	 if(self.actions[self.curr_action] == 'l') then
   	 add(lasers,{origin=ship,range=self.laser_range,angle=self.angle,color=8,ttl=5})
   	end
   	if(self.actions[self.curr_action] == 'm') then
-  	 add(torps,{x=self.x,y=self.y,angle=self.angle,xv=self.xv,yv=self.yv,ttl=30}) 
+    add(torps,{x=self.x,y=self.y,angle=self.angle,xv=self.xv+torp_speed*cos(angle),yv=self.yv+torp_speed*sin(angle),ttl=30}) 
   	end
   end
+  -- select action
   if(controls.select)then
   	self.curr_action+=1
   	if(self.curr_action>count(self.actions)) self.curr_action=1
