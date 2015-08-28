@@ -37,7 +37,7 @@ end
 function age_transient(transient,array)	
   transient.ttl-=1
   if transient.ttl < 0 then
-   del(array,transients)
+   del(array,transient)
   end
 end
 
