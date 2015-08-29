@@ -1,7 +1,7 @@
 pico-8 cartridge // http://www.pico-8.com
 version 4
 __lua__
--- vim: set ft=lua ts=1 sw=2 noet: 
+-- vim: set ft=lua ts=1 sw=1 noet: 
 function line_intersects_convex_poly(x1,y1,x2,y2,poly)
 	-- returns bool,x,y (hit, one point of intersection if hit)
  local hit
@@ -35,29 +35,119 @@ function line_intersects_line(x0,y0,x1,y1,x2,y2,x3,y3)
  t=(s2x*(y0-y2)-s2y*(x0-x2))/denom
  if(s>=0 and s<=1 and t>=0 and t<=1) then
 		-- intersection!
-		return true,x0+t*s1x,y0+t*s1x
+		return true,x0+t*s1x,y0+t*s1y
  else
 		return false,0,0
 	end
 end	
 
-hit=false
-x=0
-y=0
-p1={x=10,y=20}
-p2={x=30,y=20}
-p3={x=20,y=30}
-p4={x=20,y=10}
+local tests={}
+local t1={
+name="simple",
+hit=false,
+x=0,
+y=0,
+p1={x=-10,y=0},
+p2={x=10,y=0},
+p3={x=0,y=10},
+p4={x=0,y=-10}
+}
+
+local t2={
+name="miss",
+hit=false,
+x=0,
+y=0,
+p1={x=-10,y=10},
+p2={x=10,y=10},
+p3={x=0,y=0},
+p4={x=10,y=-10}
+}
+
+
+local t3={
+name="sharedv",
+hit=false,
+x=0,
+y=0,
+p1={x=-10,y=-10},
+p2={x=10,y=-10},
+p3={x=-10,y=-10},
+p4={x=-10,y=10},
+}
+
+local t4={
+name="parallel",
+hit=false,
+x=0,
+y=0,
+p1={x=-10,y=10},
+p2={x=10,y=10},
+p3={x=-10,y=0},
+p4={x=10,y=-0}
+}
+
+function _init()
+	add(tests,t1)
+	add(tests,t2)
+	add(tests,t3)
+	add(tests,t4)
+end
 
 function _update()
-	hit,x,y=line_intersects_line(p1.x,p1.y,p2.x,p2.y,p3.x,p3.y,p4.x,p4.y)
+ for t in all(tests) do
+  t.hit,t.x,t.y=line_intersects_line(t.p1.x,t.p1.y,
+	    t.p2.x,t.p2.y,
+					t.p3.x,t.p3.y,
+					t.p4.x,t.p4.y)
+	end
 end
 
 function _draw()
  cls()
-	line(p1.x,p1.y,p2.x,p2.y,11)
-	line(p3.x,p3.y,p4.x,p4.y,11)
-	print((hit and 't' or 'f')..","..x..","..y)
+ txt={"line/line intersection",
+  "unit tests"}
+ local i=0
+ foreach(txt,function(str) 
+ 		print(str,64-(#str*4/2),64-count(txt)+i*6,7)
+  	i+=1
+  end)
+	local ox=32
+	local oy=32
+ for i=1,count(tests) do
+		if i==2 then
+			ox=96
+			oy=32
+		end
+		if i==3 then
+			ox=32
+			oy=96
+		end
+		if i==4 then
+			ox=96
+			oy=96
+		end
+
+		t=tests[i]	
+		if t.hit then
+		 color(11) 
+		else
+		 color(8)
+		end
+		x1=ox+t.p1.x
+		y1=oy+t.p1.y
+		x2=ox+t.p2.x
+		y2=oy+t.p2.y
+		x3=ox+t.p3.x
+		y3=oy+t.p3.y
+		x4=ox+t.p4.x
+		y4=oy+t.p4.y
+		line(x1,y1,x2,y2)
+		line(x3,y3,x4,y4)
+		print(t.name,ox-10,oy-18)	
+		print((t.hit and 't' or 'f')..","..t.x..","..t.y,ox-10,oy+14)
+		if(t.hit) line(ox+t.x,oy+t.y,ox+t.x,oy+t.y,7)
+	 end
 end
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
