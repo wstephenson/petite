@@ -1,5 +1,6 @@
 # Editor backups
 *~
+*.swp
 
 # Compiled Lua sources
 luac.out
