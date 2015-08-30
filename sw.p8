@@ -6,6 +6,7 @@ __lua__
 lasers={}
 demo={}
 torps={}
+particles={}
 torp_speed=5
 
 function demo:init()
@@ -226,6 +227,12 @@ function create_ship(type,level)
 	return ship
 end
 
+function make_explosion(point)
+	for i=1,8 do
+		add(particles,{x=point.x,y=point.y,xv=(rnd(4)-1)/4,yv=(rnd(4)-1)/4,ttl=20})
+	end
+end
+
 function mysqrt(x)
 	if x <= 0 then return 0 end
 	local r = sqrt(x)
@@ -310,10 +317,24 @@ end
 
 function _draw()
 	demo:draw()
+	for p in all(particles) do
+		line(p.x,p.y,p.x-p.xv,p.y-p.yv,p.ttl > 20 and 10 or (p.ttl > 10 and 9 or 8))
+	end
+
 end
 
 function _update()
 	demo:update()
+	for p in all(particles) do
+		p.x += p.xv
+		p.y += p.yv
+		p.xv *= 0.95
+		p.yv *= 0.95
+		p.ttl -= 1
+		if p.ttl < 0 then
+			del(particles,p)
+		end
+	end
 end
 
 
