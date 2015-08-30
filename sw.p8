@@ -39,22 +39,22 @@ function demo:update()
 	end
 	player:update()
 	for l in all(lasers) do
-		age_transient(l,lasers)
-		for o in all(objects) do
+		for o in all(self.objects) do
 			check_laser_hit(l,o)
 		end
+		age_transient(l,lasers)
 	end
 	for t in all(torps) do
 		age_transient(t,torps)
 		t.x+=t.xv
 		t.y+=t.yv
-		for o in all(objects) do
+		for o in all(self.objects) do
 			check_torp_hit(t,o)
 		end
 	end
 end
 
-function age_transient(transient,array)	
+function age_transient(transient,array)
 	transient.ttl-=1
 		if transient.ttl < 0 then
 			del(array,transient)
@@ -62,6 +62,19 @@ function age_transient(transient,array)
 end
 
 function check_laser_hit(laser,object)
+	if(laser.origin==object or laser.spent)return
+	local hit
+	local hx
+	local hy
+	local ox=laser.origin.x
+	local oy=laser.origin.y
+	local poly = object:get_poly()
+	hit,hx,hy=line_intersects_convex_poly(ox,oy,ox+laser.range*cos(laser.angle),oy+laser.range*sin(laser.angle),poly)
+	if(hit) then
+		make_explosion(vec(hx,hy))
+		laser.spent=true
+		laser.ttl-=1
+	end
 end
 
 function check_torp_hit(torp,object)
