@@ -1,23 +1,25 @@
 pico-8 cartridge // http://www.pico-8.com
 version 4
 __lua__
--- vim: set ft=lua ts=1 sw=2 noet: 
+-- vim: set ft=lua ts=1 sw=1 noet:
 -- spinning ship; using picoracer-2048 code
 lasers={}
 demo={}
 torps={}
 torp_speed=5
+
 function demo:init()
- self.objects={}
- local p=create_ship(self)
- local q=create_ship(self)
- add(self.objects,p)
- add(self.objects,q)
- q.color=12
- q.x=75
- q.y=50
- self.player=p
+	self.objects={}
+	local p=create_ship(self)
+	local q=create_ship(self)
+	add(self.objects,p)
+	add(self.objects,q)
+	q.color=12
+	q.x=75
+	q.y=50
+	self.player=p
 end
+
 function demo:update()
 	-- enter input
 	local player = self.player
@@ -30,27 +32,27 @@ function demo:update()
 		player.controls.brake = btn(3)
 	end
 	player:update()
- for l in all(lasers) do
- 	age_transient(l,lasers)
-  for o in all(objects) do
-    check_laser_hit(l,o)
-  end
- end
- for t in all(torps) do 
-  age_transient(t,torps)
-  t.x+=t.xv
-  t.y+=t.yv
-  for o in all(objects) do
-   check_torp_hit(t,o)
+	for l in all(lasers) do
+		age_transient(l,lasers)
+		for o in all(objects) do
+			check_laser_hit(l,o)
+		end
+	end
+	for t in all(torps) do
+		age_transient(t,torps)
+		t.x+=t.xv
+		t.y+=t.yv
+		for o in all(objects) do
+			check_torp_hit(t,o)
 		end
 	end
 end
 
 function age_transient(transient,array)	
-  transient.ttl-=1
-  if transient.ttl < 0 then
-   del(array,transient)
-  end
+	transient.ttl-=1
+		if transient.ttl < 0 then
+			del(array,transient)
+		end
 end
 
 function check_laser_hit(laser,object)
@@ -60,24 +62,24 @@ function check_torp_hit(torp,object)
 end
 
 function demo:draw()
- local player=self.player
- cls()
- for o in all(self.objects) do
-  o:draw()
- end
- --player:draw()
- for l in all(lasers) do
-  local ox=l.origin.x
-  local oy=l.origin.y
-  line(ox,oy,ox+l.range*cos(l.angle),oy+l.range*sin(l.angle),l.color)
- end
- for t in all(torps) do
-  line(t.x,t.y,t.x+1.5*cos(t.angle-0.45),t.y+1.5*sin(t.angle-0.45),9)
-  line(t.x,t.y,t.x+1.5*cos(t.angle+0.45),t.y+1.5*sin(t.angle+0.45),9)
- end
- print("<"..player.actions[player.curr_action]..'>',10)
+	local player=self.player
+	cls()
+	for o in all(self.objects) do
+		o:draw()
+	end
+	--player:draw()
+	for l in all(lasers) do
+		local ox=l.origin.x
+		local oy=l.origin.y
+		line(ox,oy,ox+l.range*cos(l.angle),oy+l.range*sin(l.angle),l.color)
+	end
+	for t in all(torps) do
+		line(t.x,t.y,t.x+1.5*cos(t.angle-0.45),t.y+1.5*sin(t.angle-0.45),9)
+		line(t.x,t.y,t.x+1.5*cos(t.angle+0.45),t.y+1.5*sin(t.angle+0.45),9)
+	end
+	print("<"..player.actions[player.curr_action]..'>',10)
 end
- 
+
 function create_ship(level)
 	local ship = {
 		level=level,
@@ -88,26 +90,25 @@ function create_ship(level)
 		angle=0,
 		speed=0,
 		accel=0,
-  thrust=0.2,
-  revthrust=0.08,
-  yaw=0.1,
-  maxv=4,
+		thrust=0.2,
+		revthrust=0.08,
+		yaw=0.1,
+		maxv=4,
 		color=7,
 		collision=0,
-  laser_ttl=0,
-  laser_range=20,
-  actions={"l","m"},
-  curr_action=1
+		laser_ttl=0,
+		laser_range=20,
+		actions={"l","m"},
+		curr_action=1
 	}
-	ship.controls = {
-	}
+	ship.controls = {}
 	ship.verts = {
 		vec(2.5,2),
 		vec(-2.5,4),
 		vec(-2.5,-4),
 		vec(2.5,-2)
-
 	}
+
 	ship.get_poly = function(self)
 		return fmap(self.verts,function(i) return rotate_point(self.x+i.x,self.y+i.y,self.angle,self.x,self.y) end)
 	end
@@ -123,11 +124,11 @@ function create_ship(level)
 		local controls = self.controls
 
 		if controls.thrust then
- 		local speed = mysqrt(xv*xv+yv*yv)
-   if(speed<self.maxv) then
-   	xv+=ax*self.thrust
-    yv+=ay*self.thrust
-   end
+			local speed = mysqrt(xv*xv+yv*yv)
+			if(speed<self.maxv) then
+				xv+=ax*self.thrust
+				yv+=ay*self.thrust
+			end
 		end
 		-- accelerate
 		if controls.left then angle+=self.yaw*0.3 end
@@ -150,8 +151,8 @@ function create_ship(level)
 --			if sb_right then
 --				angle -= speed*0.0009
 --			end
- 		local speed = mysqrt(xv*xv+yv*yv)
-   if(speed<self.maxv) then
+			local speed = mysqrt(xv*xv+yv*yv)
+			if(speed<self.maxv) then
 				xv-=ax*self.revthrust
 				yv-=ay*self.revthrust
 			end
@@ -167,18 +168,18 @@ function create_ship(level)
 		yv*=0.99
 		-- actions (lasers,torps)
 		if(controls.action) then
- 	 if(self.actions[self.curr_action] == 'l') then
-  	 add(lasers,{origin=ship,range=self.laser_range,angle=self.angle,color=8,ttl=5})
-  	end
-  	if(self.actions[self.curr_action] == 'm') then
-    add(torps,{x=self.x,y=self.y,angle=self.angle,xv=self.xv+torp_speed*cos(angle),yv=self.yv+torp_speed*sin(angle),ttl=30}) 
-  	end
-  end
-  -- select action
-  if(controls.select)then
-  	self.curr_action+=1
-  	if(self.curr_action>count(self.actions)) self.curr_action=1
-  end	
+			if(self.actions[self.curr_action] == 'l') then
+				add(lasers,{origin=ship,range=self.laser_range,angle=self.angle,color=8,ttl=5})
+			end
+			if(self.actions[self.curr_action] == 'm') then
+				add(torps,{x=self.x,y=self.y,angle=self.angle,xv=self.xv+torp_speed*cos(angle),yv=self.yv+torp_speed*sin(angle),ttl=30}) 
+			end
+		end
+		-- select action
+		if(controls.select)then
+			self.curr_action+=1
+			if(self.curr_action>count(self.actions)) self.curr_action=1
+		end
 		-- update self attrs
 		self.x = x
 		self.y = y
