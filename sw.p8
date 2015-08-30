@@ -10,13 +10,18 @@ torp_speed=5
 
 function demo:init()
 	self.objects={}
-	local p=create_ship(self)
-	local q=create_ship(self)
+	local p=create_ship('C', self)
+	local q=create_ship('K', self)
+	local r=create_ship('S', self)
 	add(self.objects,p)
 	add(self.objects,q)
+	add(self.objects,r)
 	q.color=12
 	q.x=75
 	q.y=50
+	r.color=13
+	r.x=50
+	r.y=75
 	self.player=p
 end
 
@@ -80,7 +85,7 @@ function demo:draw()
 	print("<"..player.actions[player.curr_action]..'>',10)
 end
 
-function create_ship(level)
+function create_ship(type,level)
 	local ship = {
 		level=level,
 		x=50,
@@ -102,12 +107,32 @@ function create_ship(level)
 		curr_action=1
 	}
 	ship.controls = {}
-	ship.verts = {
-		vec(2.5,2),
-		vec(-2.5,4),
-		vec(-2.5,-4),
-		vec(2.5,-2)
-	}
+	if type=='K' then
+		ship.verts = {
+			vec(5,0),
+			vec(0,5),
+			vec(-1.5,0),
+			vec(0,-5)
+		}
+	else
+		if type=='C' then
+			ship.verts = {
+				vec(1,-7),
+				vec(6,-2),
+				vec(6,2),
+				vec(1,7),
+				vec(-1.5,7),
+				vec(-1.5,-7),
+			}
+		else
+			ship.verts = {
+			vec(2.5,2),
+			vec(-2.5,4),
+			vec(-2.5,-4),
+			vec(2.5,-2)
+		}
+		end
+	end
 
 	ship.get_poly = function(self)
 		return fmap(self.verts,function(i) return rotate_point(self.x+i.x,self.y+i.y,self.angle,self.x,self.y) end)
