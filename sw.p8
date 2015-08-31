@@ -372,12 +372,31 @@ function line_intersects_line(x0,y0,x1,y1,x2,y2,x3,y3)
 	end
 end
 
+function hbar(x,y,w,h,v,max,color,label)
+	local abswidth=v/max*w+#label*4
+	print(label,x,y,color)
+	rectfill(x+#label*4,y,x+abswidth,y+h-1,color)
+end
+
+function debug()
+	local ox=0
+	print("debug",0,94,7)
+	for o in all(demo.objects) do
+		hbar(ox,100,16,5,o.hp,o.maxhp,7,'d:')
+		hbar(ox,106,16,5,o.shield,o.maxshield,12,'s:')
+		hbar(ox,112,16,5,o.timer_shield_recharge,shield_recharge_wait,2,'w:')
+		hbar(ox,118,16,5,o.heat,o.maxheat,8,'h:')
+		ox+=30
+	end
+end
+
 function _init()
 	demo:init()
 end
 
 function _draw()
 	demo:draw()
+	debug()
 	for p in all(particles) do
 		line(p.x,p.y,p.x-p.xv,p.y-p.yv,p.ttl > 12 and 10 or (p.ttl > 7 and 9 or 8))
 	end
