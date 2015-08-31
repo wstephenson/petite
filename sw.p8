@@ -15,6 +15,8 @@ dmg_torp=60
 shield_recharge_wait=150 -- 5 seconds
 
 function demo:init()
+	self.lastcx=64
+	self.lastcy=64
 	self.objects={}
 	local p=create_ship('C', self)
 	local q=create_ship('K', self)
@@ -118,6 +120,13 @@ end
 function demo:draw()
 	local player=self.player
 	cls()
+	local cx,cy
+	cx=player.x-64
+	cy=player.y-64
+	camera(lerp(self.lastcx,cx,0.5),lerp(self.lastcy,cy,0.5))
+	self.lastcx = cx
+	self.lastcy = cy
+
 	for o in all(self.objects) do
 		o:draw()
 	end
@@ -131,6 +140,10 @@ function demo:draw()
 		line(t.x,t.y,t.x+1.5*cos(t.angle-0.45),t.y+1.5*sin(t.angle-0.45),9)
 		line(t.x,t.y,t.x+1.5*cos(t.angle+0.45),t.y+1.5*sin(t.angle+0.45),9)
 	end
+	for p in all(particles) do
+		line(p.x,p.y,p.x-p.xv,p.y-p.yv,p.ttl > 12 and 10 or (p.ttl > 7 and 9 or 8))
+	end
+	camera()
 	print("<"..player.actions[player.curr_action]..'>',10)
 end
 
@@ -389,6 +402,10 @@ function line_intersects_line(x0,y0,x1,y1,x2,y2,x3,y3)
 	end
 end
 
+function lerp(a,b,t)
+ return (1-t)*a+t*b
+end
+
 function hbar(x,y,w,h,v,max,color,label)
 	local abswidth=v/max*w+#label*4
 	print(label,x,y,color)
@@ -414,9 +431,6 @@ end
 function _draw()
 	demo:draw()
 	debug()
-	for p in all(particles) do
-		line(p.x,p.y,p.x-p.xv,p.y-p.yv,p.ttl > 12 and 10 or (p.ttl > 7 and 9 or 8))
-	end
 end
 
 function _update()
