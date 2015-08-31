@@ -38,6 +38,7 @@ function system:init()
 end
 
 function system:update()
+	self.environment:update()
 	-- enter input
 	local player = self.player
 	if player then
@@ -339,11 +340,29 @@ function create_system()
    y=-50,
    r=5,
 			color=11
-  }
+  },
+	 station = {
+   x=35,
+   y=-50,
+			angle=0.25,
+   color=9,
+   verts={
+				vec(-4,-4),
+				vec(4,-4),
+				vec(4,4),
+				vec(-4,4)
+			}
+		}
 	}
+ system.update = function(self)
+  self.station.angle-=0.005
+ end
  system.draw = function(self)
 		circ(self.sun.x,self.sun.y,self.sun.r+rnd(1)-0.5,self.sun.color)
 		circ(self.planet.x,self.planet.y,self.planet.r,self.planet.color)
+  local station=self.station
+		local poly=fmap(station.verts,function(i) return rotate_point(station.x+i.x,station.y+i.y,station.angle,station.x,station.y) end)
+		draw_poly(poly,station.color)
 	end
 	return system
 end
