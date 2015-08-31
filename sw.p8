@@ -101,6 +101,7 @@ end
 
 function create_ship(type,level)
 	local ship = {
+		type=type,
 		level=level,
 		x=50,
 		y=50,
