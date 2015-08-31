@@ -7,7 +7,11 @@ lasers={}
 demo={}
 torps={}
 particles={}
-torp_speed=5
+speed_torp=5
+heat_laser=30
+heat_torp=60
+dmg_laser=20
+dmg_torp=60
 
 function demo:init()
 	self.objects={}
@@ -74,10 +78,23 @@ function check_laser_hit(laser,object)
 		make_explosion(vec(hx,hy))
 		laser.spent=true
 		laser.ttl-=1
+		apply_damage('L', object)
 	end
 end
 
 function check_torp_hit(torp,object)
+end
+
+-- all weapons damage equally
+function apply_damage(weapon, subject)
+	-- assume weapon 'L'
+	local dmg_over_shield=min(0,subject.shield-dmg_laser)
+	subject.shield=max(0,subject.shield-dmg_laser)
+	subject.hp+=dmg_over_shield
+	subject.color=12
+	if(subject.shield==0) subject.color=9
+	if(subject.hp<0) subject.color=4
+	if(subject.hp<0) subject:killed(weapon)
 end
 
 function demo:draw()
@@ -119,7 +136,8 @@ function create_ship(type,level)
 		laser_ttl=0,
 		laser_range=20,
 		actions={"l","m"},
-		curr_action=1
+		curr_action=1,
+		heat=0
 	}
 	ship.controls = {}
 	if type=='K' then
@@ -129,6 +147,8 @@ function create_ship(type,level)
 			vec(-1.5,0),
 			vec(0,-5)
 		}
+		ship.hp=50
+		ship.shield=50
 	else
 		if type=='C' then
 			ship.verts = {
@@ -139,13 +159,17 @@ function create_ship(type,level)
 				vec(-1.5,7),
 				vec(-1.5,-7),
 			}
+			ship.hp=80
+			ship.shield=80
 		else
 			ship.verts = {
-			vec(2.5,2),
-			vec(-2.5,4),
-			vec(-2.5,-4),
-			vec(2.5,-2)
-		}
+				vec(2.5,2),
+				vec(-2.5,4),
+				vec(-2.5,-4),
+				vec(2.5,-2)
+			}
+			ship.hp=40
+			ship.shield=40
 		end
 	end
 
@@ -210,9 +234,11 @@ function create_ship(type,level)
 		if(controls.action) then
 			if(self.actions[self.curr_action] == 'l') then
 				add(lasers,{origin=ship,range=self.laser_range,angle=self.angle,color=8,ttl=5})
+				self.heat+=heat_laser
 			end
 			if(self.actions[self.curr_action] == 'm') then
-				add(torps,{x=self.x,y=self.y,angle=self.angle,xv=self.xv+torp_speed*cos(angle),yv=self.yv+torp_speed*sin(angle),ttl=30}) 
+				add(torps,{x=self.x,y=self.y,angle=self.angle,xv=self.xv+speed_torp*cos(angle),yv=self.yv+speed_torp*sin(angle),ttl=30}) 
+				self.heat+=heat_torp
 			end
 		end
 		-- select action
@@ -228,6 +254,7 @@ function create_ship(type,level)
 		self.accel = accel
 		self.speed = speed -- used for showing speedo
 		self.angle = angle
+		self.heat=max(0,self.heat-1)
 	end
 	ship.draw = function(self)
 		local x = self.x
@@ -237,7 +264,11 @@ function create_ship(type,level)
 		local v = fmap(self.verts,function(i) return rotate_point(x+i.x,y+i.y,angle,x,y) end)
 		draw_poly(v,color)
 	end
-
+ ship.killed = function(self, killed_by)
+		-- TODO add to killer's score
+		del(self.level.objects,self)
+		make_explosion(vec(self.x,self.y))
+	end
 	return ship
 end
 
