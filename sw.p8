@@ -78,6 +78,18 @@ function check_laser_hit(laser,object)
 end
 
 function check_torp_hit(torp,object)
+	if(torp.origin==object) return
+	local hit
+	local hx
+	local hy
+	local x = torp.x+4*cos(torp.angle+0.5)
+	local y = torp.x+4*sin(torp.angle+0.5)
+	local poly = object:get_poly()
+	hit,hx,hy=line_intersects_convex_poly(torp.x,torp.y,x,y,poly)
+	if(hit) then
+		make_explosion(vec(hx,hy))
+		del(torps,torp)
+	end
 end
 
 function demo:draw()
@@ -212,7 +224,7 @@ function create_ship(type,level)
 				add(lasers,{origin=ship,range=self.laser_range,angle=self.angle,color=8,ttl=5})
 			end
 			if(self.actions[self.curr_action] == 'm') then
-				add(torps,{x=self.x,y=self.y,angle=self.angle,xv=self.xv+torp_speed*cos(angle),yv=self.yv+torp_speed*sin(angle),ttl=30}) 
+				add(torps,{origin=ship,x=self.x,y=self.y,angle=self.angle,xv=self.xv+torp_speed*cos(angle),yv=self.yv+torp_speed*sin(angle),ttl=30}) 
 			end
 		end
 		-- select action
