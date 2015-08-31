@@ -4,7 +4,7 @@ __lua__
 -- vim: set ft=lua ts=1 sw=1 noet:
 -- spinning ship; using picoracer-2048 code
 lasers={}
-demo={}
+system={}
 torps={}
 particles={}
 speed_torp=5
@@ -14,7 +14,7 @@ dmg_laser=20
 dmg_torp=60
 shield_recharge_wait=150 -- 5 seconds
 
-function demo:init()
+function system:init()
 	self.lastcx=64
 	self.lastcy=64
 	self.objects={}
@@ -31,7 +31,7 @@ function demo:init()
 	self.player=p
 end
 
-function demo:update()
+function system:update()
 	-- enter input
 	local player = self.player
 	if player then
@@ -117,7 +117,7 @@ function apply_damage(weapon, subject)
 	if(subject.hp<0) subject:killed(weapon)
 end
 
-function demo:draw()
+function system:draw()
 	local player=self.player
 	cls()
 	local cx,cy
@@ -417,7 +417,7 @@ end
 function debug()
 	local ox=0
 	print("debug",0,94,7)
-	for o in all(demo.objects) do
+	for o in all(system.objects) do
 		hbar(ox,100,16,5,o.hp,o.maxhp,7,'d:')
 		hbar(ox,106,16,5,o.shield,o.maxshield,12,'s:')
 		hbar(ox,112,16,5,o.timer_shield_recharge,shield_recharge_wait,2,'w:')
@@ -427,16 +427,16 @@ function debug()
 end
 
 function _init()
-	demo:init()
+	system:init()
 end
 
 function _draw()
-	demo:draw()
+	system:draw()
 	debug()
 end
 
 function _update()
-	demo:update()
+	system:update()
 	for p in all(particles) do
 		p.x += p.xv
 		p.y += p.yv
