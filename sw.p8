@@ -79,7 +79,7 @@ function check_laser_hit(laser,object)
 		make_explosion(vec(hx,hy))
 		laser.spent=true
 		laser.ttl-=1
-		apply_damage('L', object)
+		apply_damage('l', object)
 	end
 end
 
@@ -95,16 +95,21 @@ function check_torp_hit(torp,object)
 	if(hit) then
 		make_explosion(vec(hx,hy))
 		del(torps,torp)
+		apply_damage('t', object)
 	end
 end
 
--- is this getting called too often?
 -- all weapons damage equally
 function apply_damage(weapon, subject)
-	-- assume weapon 'L'
+	local dmg
+	if(weapon=='l')then
+		dmg=dmg_laser
+	else --torp
+		dmg=dmg_torp
+	end
 	local old_shield=subject.shield
-	local dmg_to_hull=min(0,subject.shield-dmg_laser)
-	subject.shield=max(0,subject.shield-dmg_laser)
+	local dmg_to_hull=min(0,subject.shield-dmg)
+	subject.shield=max(0,subject.shield-dmg)
 	if (old_shield > 0 and subject.shield == 0 and subject.timer_shield_recharge == 0) subject.timer_shield_recharge = shield_recharge_wait
 	subject.hp+=dmg_to_hull
 	if(subject.hp<0) subject:killed(weapon)
