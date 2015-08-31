@@ -15,6 +15,8 @@ dmg_torp=60
 shield_recharge_wait=150 -- 5 seconds
 
 function demo:init()
+	self.lastcx=64
+	self.lastcy=64
 	self.objects={}
 	self.ducks={}
 	self.duckpopulation=0
@@ -94,7 +96,7 @@ function age_transient(transient,array)
 end
 
 function check_laser_hit(laser,object)
-	if(laser.origin==object or laser.spent)return
+	if(laser.origin==object or laser.spent==true)return
 	local hit
 	local hx
 	local hy
@@ -103,7 +105,7 @@ function check_laser_hit(laser,object)
 	local poly = object:get_poly()
 	hit,hx,hy=line_intersects_convex_poly(ox,oy,ox+laser.range*cos(laser.angle),oy+laser.range*sin(laser.angle),poly)
 	if(hit) then
-		make_explosion(vec(hx,hy))
+		make_explosion(vec(hx,hy),object.xv,object.yv)
 		laser.spent=true
 		laser.ttl-=1
 		apply_damage('l', object)
@@ -120,7 +122,7 @@ function check_torp_hit(torp,object)
 	local poly = object:get_poly()
 	hit,hx,hy=line_intersects_convex_poly(torp.x,torp.y,x,y,poly)
 	if(hit) then
-		make_explosion(vec(hx,hy))
+		make_explosion(vec(hx,hy),(torp.xv+object.xv)/4,(torp.yv+object.yv)/4)
 		del(torps,torp)
 		apply_damage('t', object)
 	end
@@ -145,6 +147,13 @@ end
 function demo:draw()
 	local player=self.player
 	cls()
+	local cx,cy
+	cx=player.x-64
+	cy=player.y-64
+	camera(lerp(self.lastcx,cx,0.5),lerp(self.lastcy,cy,0.5))
+	self.lastcx = cx
+	self.lastcy = cy
+
 	for o in all(self.objects) do
 		o:draw()
 	end
@@ -158,6 +167,10 @@ function demo:draw()
 		line(t.x,t.y,t.x+1.5*cos(t.angle-0.45),t.y+1.5*sin(t.angle-0.45),9)
 		line(t.x,t.y,t.x+1.5*cos(t.angle+0.45),t.y+1.5*sin(t.angle+0.45),9)
 	end
+	for p in all(particles) do
+		line(p.x,p.y,p.x-p.xv,p.y-p.yv,p.ttl > 12 and 10 or (p.ttl > 7 and 9 or 8))
+	end
+	camera()
 	print("<"..player.actions[player.curr_action]..'>',10)
 end
 
@@ -286,7 +299,7 @@ function create_ship(type,level)
 		if(controls.action) then
 			if(self.actions[self.curr_action] == 'l') then
 				if(self.heat<self.maxheat) then
-					add(lasers,{origin=ship,range=self.laser_range,angle=self.angle,color=8,ttl=5})
+					add(lasers,{origin=ship,range=self.laser_range,angle=self.angle,color=8,ttl=5,spent=false})
 					self.heat+=heat_laser
 				end
 			end
@@ -331,14 +344,16 @@ function create_ship(type,level)
 		-- TODO add to killer's score
 		self.killed=true
 		del(self.level.objects,self)
-		make_explosion(vec(self.x,self.y))
+		make_explosion(vec(self.x,self.y,self.xv,self.yv))
 	end
 	return ship
 end
 
-function make_explosion(point)
+function make_explosion(point,xv,yv)
+	xv=xv or 0
+	yv=yv or 0
 	for i=1,8 do
-		add(particles,{x=point.x,y=point.y,xv=rnd(2)-1,yv=rnd(2)-1,ttl=20})
+		add(particles,{x=point.x,y=point.y,xv=xv+rnd(2)-1,yv=yv+rnd(2)-1,ttl=20})
 	end
 end
 
@@ -420,6 +435,10 @@ function line_intersects_line(x0,y0,x1,y1,x2,y2,x3,y3)
 	end
 end
 
+function lerp(a,b,t)
+ return (1-t)*a+t*b
+end
+
 function hbar(x,y,w,h,v,max,color,label)
 	local abswidth=v/max*w+#label*4
 	print(label,x,y,color)
@@ -446,9 +465,6 @@ end
 function _draw()
 	demo:draw()
 	debug()
-	for p in all(particles) do
-		line(p.x,p.y,p.x-p.xv,p.y-p.yv,p.ttl > 12 and 10 or (p.ttl > 7 and 9 or 8))
-	end
 end
 
 function _update()
