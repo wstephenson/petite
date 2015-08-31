@@ -67,7 +67,7 @@ function age_transient(transient,array)
 end
 
 function check_laser_hit(laser,object)
-	if(laser.origin==object or laser.spent)return
+	if(laser.origin==object or laser.spent==true)return
 	local hit
 	local hx
 	local hy
@@ -256,7 +256,7 @@ function create_ship(type,level)
 		if(controls.action) then
 			if(self.actions[self.curr_action] == 'l') then
 				if(self.heat<self.maxheat) then
-					add(lasers,{origin=ship,range=self.laser_range,angle=self.angle,color=8,ttl=5})
+					add(lasers,{origin=ship,range=self.laser_range,angle=self.angle,color=8,ttl=5,spent=false})
 					self.heat+=heat_laser
 				end
 			end
