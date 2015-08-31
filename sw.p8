@@ -78,7 +78,7 @@ function check_laser_hit(laser,object)
 	local poly = object:get_poly()
 	hit,hx,hy=line_intersects_convex_poly(ox,oy,ox+laser.range*cos(laser.angle),oy+laser.range*sin(laser.angle),poly)
 	if(hit) then
-		make_explosion(vec(hx,hy))
+		make_explosion(vec(hx,hy),object.xv,object.yv)
 		laser.spent=true
 		laser.ttl-=1
 		apply_damage('l', object)
@@ -95,7 +95,7 @@ function check_torp_hit(torp,object)
 	local poly = object:get_poly()
 	hit,hx,hy=line_intersects_convex_poly(torp.x,torp.y,x,y,poly)
 	if(hit) then
-		make_explosion(vec(hx,hy))
+		make_explosion(vec(hx,hy),(torp.xv+object.xv)/4,(torp.yv+object.yv)/4)
 		del(torps,torp)
 		apply_damage('t', object)
 	end
@@ -313,14 +313,16 @@ function create_ship(type,level)
  ship.killed = function(self, killed_by)
 		-- TODO add to killer's score
 		del(self.level.objects,self)
-		make_explosion(vec(self.x,self.y))
+		make_explosion(vec(self.x,self.y,self.xv,self.yv))
 	end
 	return ship
 end
 
-function make_explosion(point)
+function make_explosion(point,xv,yv)
+	xv=xv or 0
+	yv=yv or 0
 	for i=1,8 do
-		add(particles,{x=point.x,y=point.y,xv=rnd(2)-1,yv=rnd(2)-1,ttl=20})
+		add(particles,{x=point.x,y=point.y,xv=xv+rnd(2)-1,yv=yv+rnd(2)-1,ttl=20})
 	end
 end
 
