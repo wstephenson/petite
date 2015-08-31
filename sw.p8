@@ -307,7 +307,7 @@ end
 
 function make_explosion(point)
 	for i=1,8 do
-		add(particles,{x=point.x,y=point.y,xv=(rnd(4)-1)/4,yv=(rnd(4)-1)/4,ttl=20})
+		add(particles,{x=point.x,y=point.y,xv=rnd(2)-1,yv=rnd(2)-1,ttl=20})
 	end
 end
 
