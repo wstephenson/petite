@@ -292,7 +292,7 @@ function create_ship(type,level)
 			end
 			if(self.actions[self.curr_action] == 'm') then
 				if(self.heat<self.maxheat) then
-					add(torps,{origin=ship,x=self.x,y=self.y,angle=self.angle,xv=self.xv+speed_torp*cos(angle),yv=self.yv+speed_torp*sin(angle),ttl=30}) 
+					add(torps,{origin=ship,x=self.x,y=self.y,angle=self.angle,xv=self.xv+speed_torp*cos(angle),yv=self.yv+speed_torp*sin(angle),ttl=30})
 					self.heat+=heat_torp
 				end
 			end
