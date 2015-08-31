@@ -20,6 +20,11 @@ function system:init()
 	self.lastcy=64
 	self.objects={}
 	local p=create_ship('C', self)
+ local entry_body = self.environment.sun
+ local entry_angle=rnd(1)
+	p.x=entry_body.x+entry_body.r*1.5*cos(entry_angle)
+	p.y=entry_body.y+entry_body.r*1.5*sin(entry_angle)
+ p.angle=entry_angle
 	local q=create_ship('K', self)
 	local r=create_ship('S', self)
 	add(self.objects,p)
