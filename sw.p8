@@ -84,6 +84,18 @@ function check_laser_hit(laser,object)
 end
 
 function check_torp_hit(torp,object)
+	if(torp.origin==object) return
+	local hit
+	local hx
+	local hy
+	local x = torp.x+4*cos(torp.angle+0.5)
+	local y = torp.x+4*sin(torp.angle+0.5)
+	local poly = object:get_poly()
+	hit,hx,hy=line_intersects_convex_poly(torp.x,torp.y,x,y,poly)
+	if(hit) then
+		make_explosion(vec(hx,hy))
+		del(torps,torp)
+	end
 end
 
 -- is this getting called too often?
@@ -245,7 +257,7 @@ function create_ship(type,level)
 			end
 			if(self.actions[self.curr_action] == 'm') then
 				if(self.heat<self.maxheat) then
-					add(torps,{x=self.x,y=self.y,angle=self.angle,xv=self.xv+speed_torp*cos(angle),yv=self.yv+speed_torp*sin(angle),ttl=30}) 
+					add(torps,{origin=ship,x=self.x,y=self.y,angle=self.angle,xv=self.xv+speed_torp*cos(angle),yv=self.yv+speed_torp*sin(angle),ttl=30})
 					self.heat+=heat_torp
 				end
 			end
