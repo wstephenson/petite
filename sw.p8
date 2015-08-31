@@ -12,6 +12,7 @@ heat_laser=30
 heat_torp=60
 dmg_laser=20
 dmg_torp=60
+shield_recharge_wait=150 -- 5 seconds
 
 function demo:init()
 	self.objects={}
@@ -21,10 +22,8 @@ function demo:init()
 	add(self.objects,p)
 	add(self.objects,q)
 	add(self.objects,r)
-	q.color=12
 	q.x=75
 	q.y=50
-	r.color=13
 	r.x=50
 	r.y=75
 	self.player=p
@@ -41,7 +40,9 @@ function demo:update()
 		player.controls.thrust = btn(2)
 		player.controls.brake = btn(3)
 	end
-	player:update()
+	for o in all(self.objects) do
+		o:update()
+	end
 	for l in all(lasers) do
 		for o in all(self.objects) do
 			check_laser_hit(l,o)
@@ -85,15 +86,15 @@ end
 function check_torp_hit(torp,object)
 end
 
+-- is this getting called too often?
 -- all weapons damage equally
 function apply_damage(weapon, subject)
 	-- assume weapon 'L'
-	local dmg_over_shield=min(0,subject.shield-dmg_laser)
+	local old_shield=subject.shield
+	local dmg_to_hull=min(0,subject.shield-dmg_laser)
 	subject.shield=max(0,subject.shield-dmg_laser)
-	subject.hp+=dmg_over_shield
-	subject.color=12
-	if(subject.shield==0) subject.color=9
-	if(subject.hp<0) subject.color=4
+	if (old_shield > 0 and subject.shield == 0 and subject.timer_shield_recharge == 0) subject.timer_shield_recharge = shield_recharge_wait
+	subject.hp+=dmg_to_hull
 	if(subject.hp<0) subject:killed(weapon)
 end
 
@@ -137,7 +138,8 @@ function create_ship(type,level)
 		laser_range=20,
 		actions={"l","m"},
 		curr_action=1,
-		heat=0
+		heat=0,
+		timer_shield_recharge=0
 	}
 	ship.controls = {}
 	if type=='K' then
@@ -147,8 +149,8 @@ function create_ship(type,level)
 			vec(-1.5,0),
 			vec(0,-5)
 		}
-		ship.hp=50
-		ship.shield=50
+		ship.maxhp=50
+		ship.maxshield=50
 	else
 		if type=='C' then
 			ship.verts = {
@@ -159,8 +161,8 @@ function create_ship(type,level)
 				vec(-1.5,7),
 				vec(-1.5,-7),
 			}
-			ship.hp=80
-			ship.shield=80
+			ship.maxhp=80
+			ship.maxshield=80
 		else
 			ship.verts = {
 				vec(2.5,2),
@@ -168,10 +170,13 @@ function create_ship(type,level)
 				vec(-2.5,-4),
 				vec(2.5,-2)
 			}
-			ship.hp=40
-			ship.shield=40
+			ship.maxhp=40
+			ship.maxshield=40
 		end
 	end
+	ship.maxheat=heat_laser*4
+	ship.hp=ship.maxhp
+	ship.shield=ship.maxshield
 
 	ship.get_poly = function(self)
 		return fmap(self.verts,function(i) return rotate_point(self.x+i.x,self.y+i.y,self.angle,self.x,self.y) end)
@@ -233,12 +238,16 @@ function create_ship(type,level)
 		-- actions (lasers,torps)
 		if(controls.action) then
 			if(self.actions[self.curr_action] == 'l') then
-				add(lasers,{origin=ship,range=self.laser_range,angle=self.angle,color=8,ttl=5})
-				self.heat+=heat_laser
+				if(self.heat<self.maxheat) then
+					add(lasers,{origin=ship,range=self.laser_range,angle=self.angle,color=8,ttl=5})
+					self.heat+=heat_laser
+				end
 			end
 			if(self.actions[self.curr_action] == 'm') then
-				add(torps,{x=self.x,y=self.y,angle=self.angle,xv=self.xv+speed_torp*cos(angle),yv=self.yv+speed_torp*sin(angle),ttl=30}) 
-				self.heat+=heat_torp
+				if(self.heat<self.maxheat) then
+					add(torps,{x=self.x,y=self.y,angle=self.angle,xv=self.xv+speed_torp*cos(angle),yv=self.yv+speed_torp*sin(angle),ttl=30}) 
+					self.heat+=heat_torp
+				end
 			end
 		end
 		-- select action
@@ -247,6 +256,7 @@ function create_ship(type,level)
 			if(self.curr_action>count(self.actions)) self.curr_action=1
 		end
 		-- update self attrs
+		-- motion
 		self.x = x
 		self.y = y
 		self.xv = xv
@@ -254,13 +264,19 @@ function create_ship(type,level)
 		self.accel = accel
 		self.speed = speed -- used for showing speedo
 		self.angle = angle
+		-- heat
 		self.heat=max(0,self.heat-1)
+		-- shields
+		--self.timer_shield_recharge+=1
+		self.timer_shield_recharge=max(0,self.timer_shield_recharge-1)
+		if (self.timer_shield_recharge>0) self.timer_shield_recharge-=1
+		if (self.timer_shield_recharge==0) self.shield=min(self.shield+1,self.maxshield)
 	end
 	ship.draw = function(self)
 		local x = self.x
 		local y = self.y
 		local angle = self.angle
-		local color = self.color
+		local color = (self.shield==self.maxshield) and self.color or (self.shield > 0 and 12 or (self.hp > 0 and 9 or 4))
 		local v = fmap(self.verts,function(i) return rotate_point(x+i.x,y+i.y,angle,x,y) end)
 		draw_poly(v,color)
 	end
@@ -363,9 +379,8 @@ end
 function _draw()
 	demo:draw()
 	for p in all(particles) do
-		line(p.x,p.y,p.x-p.xv,p.y-p.yv,p.ttl > 20 and 10 or (p.ttl > 10 and 9 or 8))
+		line(p.x,p.y,p.x-p.xv,p.y-p.yv,p.ttl > 12 and 10 or (p.ttl > 7 and 9 or 8))
 	end
-
 end
 
 function _update()
