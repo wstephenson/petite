@@ -16,17 +16,43 @@ shield_recharge_wait=150 -- 5 seconds
 
 function demo:init()
 	self.objects={}
+	self.ducks={}
+	self.duckpopulation=0
+
 	local p=create_ship('C', self)
-	local q=create_ship('K', self)
-	local r=create_ship('S', self)
 	add(self.objects,p)
-	add(self.objects,q)
-	add(self.objects,r)
-	q.x=75
-	q.y=50
-	r.x=50
-	r.y=75
 	self.player=p
+	self.add_duck = function(self)
+		if (self.duckpopulation<=5) then
+			local s=create_ship('S', self)
+			s.x=-10
+			s.y=30
+			s.xv=4
+			s.color=10
+			add(self.ducks,s)
+			add(self.objects,s)
+			self.duckpopulation+=1
+		end
+	end
+
+	self.manage_ducks = function(self)
+		local lastduck = self.ducks[count(self.ducks)]
+		if (lastduck) then
+			if (lastduck.x > 12) then
+				self:add_duck()
+			end
+		else
+			self:add_duck()
+		end
+		for d in all(self.ducks) do
+			if(d.killed==true) then
+				del(self.ducks,d)
+				if(count(self.ducks)==0) self.duckpopulation=0
+			end
+			if(d.x>128)d.x=-10
+		end
+	end
+
 end
 
 function demo:update()
@@ -57,6 +83,7 @@ function demo:update()
 			check_torp_hit(t,o)
 		end
 	end
+	self:manage_ducks()
 end
 
 function age_transient(transient,array)
@@ -156,6 +183,7 @@ function create_ship(type,level)
 		actions={"l","m"},
 		curr_action=1,
 		heat=0,
+		killed=false,
 		timer_shield_recharge=0
 	}
 	ship.controls = {}
@@ -250,8 +278,10 @@ function create_ship(type,level)
 		x+=xv*0.3
 		y+=yv*0.3
 
-		xv*=0.99
-		yv*=0.99
+		if(demo.player == self) then
+			xv*=0.99
+			yv*=0.99
+	end
 		-- actions (lasers,torps)
 		if(controls.action) then
 			if(self.actions[self.curr_action] == 'l') then
@@ -287,7 +317,7 @@ function create_ship(type,level)
 		--self.timer_shield_recharge+=1
 		self.timer_shield_recharge=max(0,self.timer_shield_recharge-1)
 		if (self.timer_shield_recharge>0) self.timer_shield_recharge-=1
-		if (self.timer_shield_recharge==0) self.shield=min(self.shield+1,self.maxshield)
+		if (self.timer_shield_recharge==0) self.shield=min(self.shield+0.25,self.maxshield)
 	end
 	ship.draw = function(self)
 		local x = self.x
@@ -299,6 +329,7 @@ function create_ship(type,level)
 	end
  ship.killed = function(self, killed_by)
 		-- TODO add to killer's score
+		self.killed=true
 		del(self.level.objects,self)
 		make_explosion(vec(self.x,self.y))
 	end
@@ -397,13 +428,14 @@ end
 
 function debug()
 	local ox=0
-	print("debug",0,94,7)
+	print("debug - "..count(demo.ducks),0,94,7)
 	for o in all(demo.objects) do
-		hbar(ox,100,16,5,o.hp,o.maxhp,7,'d:')
-		hbar(ox,106,16,5,o.shield,o.maxshield,12,'s:')
-		hbar(ox,112,16,5,o.timer_shield_recharge,shield_recharge_wait,2,'w:')
-		hbar(ox,118,16,5,o.heat,o.maxheat,8,'h:')
-		ox+=30
+		hbar(ox,100,8,5,o.hp,o.maxhp,7,'d:')
+		hbar(ox,106,8,5,o.shield,o.maxshield,12,'s:')
+		hbar(ox,112,8,5,o.timer_shield_recharge,shield_recharge_wait,2,'w:')
+		hbar(ox,118,8,5,o.heat,o.maxheat,8,'h:')
+
+		ox+=18
 	end
 end
 
