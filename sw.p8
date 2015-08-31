@@ -2,7 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 4
 __lua__
 -- vim: set ft=lua ts=1 sw=1 noet:
--- spinning ship; using picoracer-2048 code
+-- using picoracer-2048 code
 lasers={}
 system={}
 torps={}
@@ -15,6 +15,7 @@ dmg_torp=60
 shield_recharge_wait=150 -- 5 seconds
 
 function system:init()
+ self.environment=create_system()
 	self.lastcx=64
 	self.lastcy=64
 	self.objects={}
@@ -24,10 +25,10 @@ function system:init()
 	add(self.objects,p)
 	add(self.objects,q)
 	add(self.objects,r)
-	q.x=75
-	q.y=50
-	r.x=50
-	r.y=75
+	q.x=25
+	q.y=0
+	r.x=0
+	r.y=-25
 	self.player=p
 end
 
@@ -127,6 +128,8 @@ function system:draw()
 	self.lastcx = cx
 	self.lastcy = cy
 
+ self.environment:draw()
+
 	for o in all(self.objects) do
 		o:draw()
 	end
@@ -147,12 +150,12 @@ function system:draw()
 	print("<"..player.actions[player.curr_action]..'>',10)
 end
 
-function create_ship(type,level)
+function create_ship(type,system)
 	local ship = {
 		type=type,
-		level=level,
-		x=50,
-		y=50,
+		system=system,
+		x=0,
+		y=0,
 		xv=0,
 		yv=0,
 		angle=0,
@@ -312,11 +315,35 @@ function create_ship(type,level)
 	end
  ship.killed = function(self, killed_by)
 		-- TODO add to killer's score
-		del(self.level.objects,self)
+		del(self.system.objects,self)
 		make_explosion(vec(self.x,self.y,self.xv,self.yv))
 	end
 	return ship
 end
+
+function create_system()
+	local system = {
+		sun = {
+			x=-50,
+   y=50,
+   r=20,
+   color=10
+  },
+  planet = {
+   x=50,
+   y=-50,
+   r=5,
+			color=11
+  }
+	}
+ system.draw = function(self)
+		circ(self.sun.x,self.sun.y,self.sun.r+rnd(1)-0.5,self.sun.color)
+		circ(self.planet.x,self.planet.y,self.planet.r,self.planet.color)
+	end
+	return system
+end
+
+
 
 function make_explosion(point,xv,yv)
 	xv=xv or 0
