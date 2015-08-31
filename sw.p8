@@ -21,7 +21,7 @@ function system:init()
 	self.objects={}
 	local p=create_ship('C', self)
  local entry_body = self.environment.sun
- local entry_angle=rnd(1)
+ local entry_angle=0.125
 	p.x=entry_body.x+entry_body.r*1.5*cos(entry_angle)
 	p.y=entry_body.y+entry_body.r*1.5*sin(entry_angle)
  p.angle=entry_angle
@@ -330,20 +330,20 @@ end
 function create_system()
 	local system = {
 		sun = {
-			x=-50,
-   y=50,
-   r=20,
+			x=-75,
+   y=75,
+   r=50,
    color=10
   },
   planet = {
-   x=50,
-   y=-50,
-   r=5,
+   x=60,
+   y=-60,
+   r=20,
 			color=11
   },
 	 station = {
-   x=35,
-   y=-50,
+   x=60+40*cos(-0.375),
+   y=-60+40*sin(-0.375),
 			angle=0.25,
    color=9,
    verts={
