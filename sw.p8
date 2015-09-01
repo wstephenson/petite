@@ -15,13 +15,13 @@ dmg_torp=60
 shield_recharge_wait=150 -- 5 seconds
 
 function system:init()
- self.environment=create_system()
+	self.environment=create_system()
 	self.lastcx=64
 	self.lastcy=64
 	self.objects={}
 	local p=create_ship('C', self)
- local entry_body = self.environment.sun
- local entry_angle=0.125
+	local entry_body = self.environment.sun
+	local entry_angle=0.125
 	p.x=entry_body.x+entry_body.r*1.5*cos(entry_angle)
 	p.y=entry_body.y+entry_body.r*1.5*sin(entry_angle)
  p.angle=entry_angle
@@ -331,22 +331,22 @@ function create_system()
 	local system = {
 		sun = {
 			x=-75,
-   y=75,
-   r=50,
-   color=10
-  },
-  planet = {
-   x=60,
-   y=-60,
-   r=20,
+			y=75,
+			r=50,
+			color=10
+		},
+		planet = {
+			x=60,
+			y=-60,
+			r=20,
 			color=11
-  },
+		},
 	 station = {
-   x=60+40*cos(-0.375),
-   y=-60+40*sin(-0.375),
+			x=60+40*cos(-0.375),
+			y=-60+40*sin(-0.375),
 			angle=0.25,
-   color=9,
-   verts={
+			color=9,
+			verts={
 				vec(-4,-4),
 				vec(4,-4),
 				vec(4,4),
@@ -354,13 +354,14 @@ function create_system()
 			}
 		}
 	}
- system.update = function(self)
-  self.station.angle-=0.005
- end
- system.draw = function(self)
+	system.update = function(self)
+		self.station.angle-=0.005
+	end
+
+	system.draw = function(self)
 		circ(self.sun.x,self.sun.y,self.sun.r+rnd(1)-0.5,self.sun.color)
 		circ(self.planet.x,self.planet.y,self.planet.r,self.planet.color)
-  local station=self.station
+		local station=self.station
 		local poly=fmap(station.verts,function(i) return rotate_point(station.x+i.x,station.y+i.y,station.angle,station.x,station.y) end)
 		draw_poly(poly,station.color)
 	end
