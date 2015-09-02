@@ -19,14 +19,14 @@ function system:init()
 	self.lastcx=64
 	self.lastcy=64
 	self.objects={}
-	local p=create_ship('C', self)
+	local p=create_ship('c', self)
 	local entry_body = self.environment.sun
 	local entry_angle=0.125
 	p.x=entry_body.x+entry_body.r*1.5*cos(entry_angle)
 	p.y=entry_body.y+entry_body.r*1.5*sin(entry_angle)
  p.angle=entry_angle
-	local q=create_ship('K', self)
-	local r=create_ship('S', self)
+	local q=create_ship('k', self)
+	local r=create_ship('s', self)
 	add(self.objects,p)
 	add(self.objects,q)
 	add(self.objects,r)
@@ -181,7 +181,7 @@ function create_ship(type,system)
 		timer_shield_recharge=0
 	}
 	ship.controls = {}
-	if type=='K' then
+	if type=='k' then
 		ship.verts = {
 			vec(5,0),
 			vec(0,5),
@@ -191,7 +191,7 @@ function create_ship(type,system)
 		ship.maxhp=50
 		ship.maxshield=50
 	else
-		if type=='C' then
+		if type=='c' then
 			ship.verts = {
 				vec(1,-7),
 				vec(6,-2),
@@ -320,7 +320,7 @@ function create_ship(type,system)
 		draw_poly(v,color)
 	end
  ship.killed = function(self, killed_by)
-		-- TODO add to killer's score
+		-- todo add to killer's score
 		del(self.system.objects,self)
 		make_explosion(vec(self.x,self.y,self.xv,self.yv))
 	end
@@ -328,32 +328,54 @@ function create_ship(type,system)
 end
 
 function create_system()
-	local system = {
-		sun = {
-			x=-75,
-			y=75,
-			r=50,
-			color=10
-		},
-		planet = {
-			x=60,
-			y=-60,
-			r=20,
-			color=11
-		},
-	 station = {
-			x=60+40*cos(-0.375),
-			y=-60+40*sin(-0.375),
-			angle=0.25,
-			color=9,
-			verts={
-				vec(-4,-4),
-				vec(4,-4),
-				vec(4,4),
-				vec(-4,4)
+	local stype='roids'
+	local system
+	if(stype=='basic' or stype=='roids') then
+		system = {
+			stype=stype,
+			sun = {
+				x=-75,
+				y=75,
+				r=50,
+				color=10
+			},
+			planet = {
+				x=60,
+				y=-60,
+				r=20,
+				color=11
+			},
+			station = {
+				x=60+40*cos(-0.375),
+				y=-60+40*sin(-0.375),
+				angle=0.25,
+				color=9,
+				verts={
+					vec(-4,-4),
+					vec(4,-4),
+					vec(4,4),
+					vec(-4,4)
+				}
 			}
 		}
-	}
+	end
+	if(stype=='roids')then
+		system.roids={}
+		foreach ({3,7,12}, function(radius)
+			for i=1,(36/radius) do
+				local tooclose=true
+				while tooclose do
+				 tooclose=false
+					roid={x=rnd(128)-64,y=rnd(128)-64,r=radius}
+					for other in all(system.roids) do
+						tooclose=(other.r+roid+r)*3>distance(vec(other.x,other.y),vec(roid.x,roid.y))
+					end
+				end
+				add(system.roids,roid)
+			end
+		end)
+	end
+
 	system.update = function(self)
 		self.station.angle-=0.005
 	end
@@ -364,11 +386,12 @@ function create_system()
 		local station=self.station
 		local poly=fmap(station.verts,function(i) return rotate_point(station.x+i.x,station.y+i.y,station.angle,station.x,station.y) end)
 		draw_poly(poly,station.color)
+		if(self.stype=='roids')then
+			foreach(system.roids, function(r) circ(r.x, r.y, r.r) end)
+		end
 	end
 	return system
 end
-
-
 
 function make_explosion(point,xv,yv)
 	xv=xv or 0
@@ -383,6 +406,19 @@ function mysqrt(x)
 	local r = sqrt(x)
 	if r < 0 then return 32768 end
 	return r
+end
+
+function vecdiff(a,b)
+ return { x=a.x-b.x, y=a.y-b.y }
+end
+
+function distance(a,b)
+ return mysqrt(distance2(a,b))
+end
+
+function distance2(a,b)
+ local d = vecdiff(a,b)
+ return d.x*d.x+d.y*d.y
 end
 
 function fmap(objs,func)
@@ -479,6 +515,7 @@ function debug()
 end
 
 function _init()
+	srand(666)
 	system:init()
 end
 
