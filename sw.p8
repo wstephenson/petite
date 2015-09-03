@@ -152,8 +152,8 @@ function system:populate()
 
 		circ(sun.x,sun.y,sun.r+rnd(1)-0.5,sun.color)
 		circ(planet.x,planet.y,planet.r,planet.color)
-		local poly=fmap(station.verts,function(i) return rotate_point(station.x+i.x,station.y+i.y,station.angle,station.x,station.y) end)
-		draw_poly(poly,station.color)
+		local poly=get_poly(station)
+		draw_poly(get_poly(station),station.color)
 		if(env.stype=='roids')then
 			foreach(env.roids, function(r) circ(r.x, r.y, r.r, 5) end)
 		end
@@ -174,7 +174,7 @@ function check_laser_hit(laser,object)
 	local hy
 	local ox=laser.origin.x
 	local oy=laser.origin.y
-	local poly = object:get_poly()
+	local poly = get_poly(object)
 	hit,hx,hy=line_intersects_convex_poly(ox,oy,ox+laser.range*cos(laser.angle),oy+laser.range*sin(laser.angle),poly)
 	if(hit) then
 		make_explosion(vec(hx,hy),object.xv,object.yv)
@@ -191,7 +191,7 @@ function check_torp_hit(torp,object)
 	local hy
 	local x = torp.x+4*cos(torp.angle+0.5)
 	local y = torp.x+4*sin(torp.angle+0.5)
-	local poly = object:get_poly()
+	local poly = get_poly(object)
 	hit,hx,hy=line_intersects_convex_poly(torp.x,torp.y,x,y,poly)
 	if(hit) then
 		make_explosion(vec(hx,hy),(torp.xv+object.xv)/4,(torp.yv+object.yv)/4)
@@ -320,9 +320,6 @@ function create_ship(type,system)
 	ship.hp=ship.maxhp
 	ship.shield=ship.maxshield
 
-	ship.get_poly = function(self)
-		return fmap(self.verts,function(i) return rotate_point(self.x+i.x,self.y+i.y,self.angle,self.x,self.y) end)
-	end
 	ship.update = function(self)
 		local angle = self.angle
 		local ax = cos(angle)
@@ -419,8 +416,7 @@ function create_ship(type,system)
 		local y = self.y
 		local angle = self.angle
 		local color = (self.shield==self.maxshield) and self.color or (self.shield > 0 and 12 or (self.hp > 0 and 9 or 4))
-		local v = fmap(self.verts,function(i) return rotate_point(x+i.x,y+i.y,angle,x,y) end)
-		draw_poly(v,color)
+		draw_poly(get_poly(self),color)
 	end
  ship.killed = function(self, killed_by)
 		-- todo add to killer's score
@@ -474,6 +470,10 @@ function rotate_point(x,y,angle,ox,oy)
 	ox = ox or 0
 	oy = oy or 0
 	return vec(cos(angle) * (x-ox) - sin(angle) * (y-oy) + ox,sin(angle) * (x-ox) + cos(angle) * (y-oy) + oy)
+end
+
+function get_poly(object)
+	return fmap(object.verts,function(i) return rotate_point(object.x+i.x,object.y+i.y,object.angle,object.x,object.y) end)
 end
 
 function linevec(a,b,col)
