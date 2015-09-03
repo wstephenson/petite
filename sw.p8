@@ -32,9 +32,12 @@ function system:init()
 end
 
 function system:update()
-	self.environment_update(self)
-	-- enter input
 	local player = self.player
+ -- indicate docked state for now
+	if(player.exited)then
+		player.color=4
+	end
+	-- enter input
 	if player then
 		player.controls.left = btn(0)
 		player.controls.right = btn(1)
@@ -60,6 +63,7 @@ function system:update()
 			check_torp_hit(t,o)
 		end
 	end
+	self.environment_update(self)
 end
 
 function system:populate()
@@ -86,6 +90,7 @@ function system:populate()
 				angle=0.25,
 				color=9,
 				verts={
+					vec(0,0),
 					vec(-4,-4),
 					vec(4,-4),
 					vec(4,4),
@@ -123,7 +128,13 @@ function system:populate()
 	player.angle=entry_angle
 
 	self.environment_update=function(self)
-		self.environment.station.angle-=0.005
+		local station=self.environment.station
+		station.angle-=0.005
+  -- check for docking
+  if(distance(vec(player.x,player.y),vec(station.x,station.y))<20 and
+					abs(station.angle%1-player.angle%1)<=0.125) then
+			player.exited=true
+  end
 	end
 
  self.environment_draw = function(self)
