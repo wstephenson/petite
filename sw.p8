@@ -551,6 +551,16 @@ function debug()
 	end
 end
 
+function debug_docking()
+	local p=system.player
+ local s=system.environment.station
+	print("debug",0,94,7)
+ print("x:"..p.x..",y:"..p.y,0,100,7)
+ print("x:"..s.x..",y:"..s.y,0,106,7)
+ print("d1:"..(distance(vec(p.x,p.y),vec(s.x,s.y))),0,112,7)
+ print("d2:"..distw(p.x,p.y,s.x,s.y),0,120,7)
+end
+
 function _init()
 	srand(666)
 	system:init()
@@ -562,7 +572,7 @@ end
 
 function _draw()
 	system:draw()
-	debug()
+	debug_docking()
 end
 
 function _update()
