@@ -15,16 +15,10 @@ dmg_torp=60
 shield_recharge_wait=150 -- 5 seconds
 
 function system:init()
-	self.environment=create_system()
 	self.lastcx=64
 	self.lastcy=64
 	self.objects={}
 	local p=create_ship('c', self)
-	local entry_body = self.environment.sun
-	local entry_angle=0.125
-	p.x=entry_body.x+entry_body.r*1.5*cos(entry_angle)
-	p.y=entry_body.y+entry_body.r*1.5*sin(entry_angle)
- p.angle=entry_angle
 	local q=create_ship('k', self)
 	local r=create_ship('s', self)
 	add(self.objects,p)
@@ -38,7 +32,7 @@ function system:init()
 end
 
 function system:update()
-	self.environment:update()
+	self.environment_update(self)
 	-- enter input
 	local player = self.player
 	if player then
@@ -64,6 +58,86 @@ function system:update()
 		t.y+=t.yv
 		for o in all(self.objects) do
 			check_torp_hit(t,o)
+		end
+	end
+end
+
+function system:populate()
+	local stype='roids'
+	self.environment={}
+	if(stype=='basic' or stype=='roids') then
+		self.environment = {
+			stype=stype,
+			sun = {
+				x=-75,
+				y=75,
+				r=50,
+				color=10
+			},
+			planet = {
+				x=60,
+				y=-60,
+				r=20,
+				color=11
+			},
+			station = {
+				x=60+40*cos(-0.375),
+				y=-60+40*sin(-0.375),
+				angle=0.25,
+				color=9,
+				verts={
+					vec(-4,-4),
+					vec(4,-4),
+					vec(4,4),
+					vec(-4,4)
+				}
+			}
+		}
+	end
+	if(stype=='roids')then
+		self.environment.roids={}
+		local roids = self.environment.roids
+		foreach ({3,7,12}, function(radius)
+			for i=1,(36/radius) do
+				local tooclose=true
+				local tries=0
+				while (tooclose and tries < 100) do
+				 tooclose=false
+					tries+=1
+					roid={x=rnd(256)-128,y=rnd(256)-128,r=radius}
+					for other in all(roids) do
+						if (not tooclose) then
+							tooclose=(other.r+roid.r)*1.5>distance(vec(other.x,other.y),vec(roid.x,roid.y))
+						end
+					end
+				end
+				add(roids,roid)
+			end
+		end)
+	end
+	local entry_body = self.environment.sun
+	local entry_angle=0.125
+	local player=self.player
+	player.x=entry_body.x+entry_body.r*1.5*cos(entry_angle)
+	player.y=entry_body.y+entry_body.r*1.5*sin(entry_angle)
+	player.angle=entry_angle
+
+	self.environment_update=function(self)
+		self.environment.station.angle-=0.005
+	end
+
+ self.environment_draw = function(self)
+		local env=self.environment
+		local sun=env.sun
+		local station=env.station
+		local planet=env.planet
+
+		circ(sun.x,sun.y,sun.r+rnd(1)-0.5,sun.color)
+		circ(planet.x,planet.y,planet.r,planet.color)
+		local poly=fmap(station.verts,function(i) return rotate_point(station.x+i.x,station.y+i.y,station.angle,station.x,station.y) end)
+		draw_poly(poly,station.color)
+		if(env.stype=='roids')then
+			foreach(env.roids, function(r) circ(r.x, r.y, r.r, 5) end)
 		end
 	end
 end
@@ -134,7 +208,7 @@ function system:draw()
 	self.lastcx = cx
 	self.lastcy = cy
 
- self.environment:draw()
+ self.environment_draw(self)
 
 	for o in all(self.objects) do
 		o:draw()
@@ -158,8 +232,6 @@ end
 
 function create_ship(type,system)
 	local ship = {
-		type=type,
-		system=system,
 		x=0,
 		y=0,
 		xv=0,
@@ -327,72 +399,6 @@ function create_ship(type,system)
 	return ship
 end
 
-function create_system()
-	local stype='roids'
-	local system
-	if(stype=='basic' or stype=='roids') then
-		system = {
-			stype=stype,
-			sun = {
-				x=-75,
-				y=75,
-				r=50,
-				color=10
-			},
-			planet = {
-				x=60,
-				y=-60,
-				r=20,
-				color=11
-			},
-			station = {
-				x=60+40*cos(-0.375),
-				y=-60+40*sin(-0.375),
-				angle=0.25,
-				color=9,
-				verts={
-					vec(-4,-4),
-					vec(4,-4),
-					vec(4,4),
-					vec(-4,4)
-				}
-			}
-		}
-	end
-	if(stype=='roids')then
-		system.roids={}
-		foreach ({3,7,12}, function(radius)
-			for i=1,(36/radius) do
-				local tooclose=true
-				while tooclose do
-				 tooclose=false
-					roid={x=rnd(128)-64,y=rnd(128)-64,r=radius}
-					for other in all(system.roids) do
-						tooclose=(other.r+roid+r)*3>distance(vec(other.x,other.y),vec(roid.x,roid.y))
-					end
-				end
-				add(system.roids,roid)
-			end
-		end)
-	end
-
-	system.update = function(self)
-		self.station.angle-=0.005
-	end
-
-	system.draw = function(self)
-		circ(self.sun.x,self.sun.y,self.sun.r+rnd(1)-0.5,self.sun.color)
-		circ(self.planet.x,self.planet.y,self.planet.r,self.planet.color)
-		local station=self.station
-		local poly=fmap(station.verts,function(i) return rotate_point(station.x+i.x,station.y+i.y,station.angle,station.x,station.y) end)
-		draw_poly(poly,station.color)
-		if(self.stype=='roids')then
-			foreach(system.roids, function(r) circ(r.x, r.y, r.r) end)
-		end
-	end
-	return system
-end
-
 function make_explosion(point,xv,yv)
 	xv=xv or 0
 	yv=yv or 0
@@ -517,6 +523,7 @@ end
 function _init()
 	srand(666)
 	system:init()
+	system:populate()
 end
 
 function _draw()
