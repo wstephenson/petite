@@ -435,14 +435,20 @@ function make_explosion(point,xv,yv)
 end
 
 function mysqrt(x)
-	if x <= 0 then return 0 end
-	local r = sqrt(x)
-	if r < 0 then return 32768 end
-	return r
+ -- assume negative values are too large for pico8 int
+	if(x==0) return 0
+ if(x < 0 or x > 32760) return 184
+	return sqrt(x)
 end
 
 function vecdiff(a,b)
  return { x=a.x-b.x, y=a.y-b.y }
+end
+
+function distw(x1,y1,x2,y2)
+ local a=x1-x2
+	local b=y1-y2
+ return mysqrt(a*a+b*b)
 end
 
 function distance(a,b)
