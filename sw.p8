@@ -243,6 +243,7 @@ end
 
 function create_ship(type,system)
 	local ship = {
+  system=system,
 		x=0,
 		y=0,
 		xv=0,
