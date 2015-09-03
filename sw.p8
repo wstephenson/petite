@@ -21,13 +21,17 @@ function system:init()
 	local p=create_ship('c', self)
 	local q=create_ship('k', self)
 	local r=create_ship('s', self)
+	local s=create_ship('p', self)
 	add(self.objects,p)
 	add(self.objects,q)
 	add(self.objects,r)
+	add(self.objects,s)
 	q.x=25
 	q.y=0
 	r.x=0
 	r.y=-25
+	s.x=0
+	s.y=75
 	self.player=p
 end
 
@@ -287,14 +291,26 @@ function create_ship(type,system)
 			ship.maxhp=80
 			ship.maxshield=80
 		else
-			ship.verts = {
-				vec(2.5,2),
-				vec(-2.5,4),
-				vec(-2.5,-4),
-				vec(2.5,-2)
-			}
-			ship.maxhp=40
-			ship.maxshield=40
+			if type=='p' then
+				ship.verts = {
+					vec(12,0),
+					vec(0,-7),
+					vec(-6,0),
+					vec(0,7),
+				}
+				ship.maxhp=160
+				ship.maxshield=80
+			else
+				-- 's'
+				ship.verts = {
+					vec(2.5,2),
+					vec(-2.5,4),
+					vec(-2.5,-4),
+					vec(2.5,-2)
+				}
+				ship.maxhp=40
+				ship.maxshield=40
+			end
 		end
 	end
 	ship.maxheat=heat_laser*4
