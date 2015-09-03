@@ -71,7 +71,7 @@ function system:update()
 end
 
 function system:populate()
-	local stype='roids'
+	local stype='basic'
 	self.environment={}
 	if(stype=='basic' or stype=='roids') then
 		self.environment = {
@@ -124,15 +124,18 @@ function system:populate()
 			end
 		end)
 	end
-	local entry_body = self.environment.sun
-	local entry_angle=0.125
-	local player=self.player
-	player.x=entry_body.x+entry_body.r*1.5*cos(entry_angle)
-	player.y=entry_body.y+entry_body.r*1.5*sin(entry_angle)
-	player.angle=entry_angle
+
+ self.entry_point = function(self)
+		local entry_body = self.environment.sun
+		local entry_angle=rnd(1)
+		return entry_body.x+entry_body.r*1.5*cos(entry_angle),
+									entry_body.y+entry_body.r*1.5*sin(entry_angle),
+									entry_angle
+	end
 
 	self.environment_update=function(self)
 		local station=self.environment.station
+		local player=self.player
 		station.angle-=0.005
   -- check for docking
   if(distance(vec(player.x,player.y),vec(station.x,station.y))<20 and
@@ -552,6 +555,9 @@ function _init()
 	srand(666)
 	system:init()
 	system:populate()
+
+	system.player.x,system.player.y,system.player.angle=system:entry_point()
+
 end
 
 function _draw()
