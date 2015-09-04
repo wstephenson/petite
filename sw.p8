@@ -51,6 +51,7 @@ function system:update()
 		player.controls.brake = btn(3)
 	end
 	for o in all(self.objects) do
+  if(o != player)o:ai()
 		o:update()
 	end
 	for l in all(lasers) do
@@ -320,6 +321,46 @@ function create_ship(type,system)
 	ship.hp=ship.maxhp
 	ship.shield=ship.maxshield
 
+	ship.ai = function(self)
+  local mode = 'to_station'
+		local station = self.system.environment.station	
+		local controls = self.controls
+  local me=vec(self.x,self.y)
+  local it=vec(station.x,station.y)
+  -- if the difference between our angle and the bearing to the station is greater than lim, turn
+  local vd=vecdiff(me,it)
+  local bearing=atan2(vd.x,vd.y)
+  local ad=self.angle+0.5-bearing
+  if(abs(ad)>0.05) then
+			if(ad<0) then
+				controls.left = true
+				controls.right = false
+				controls.thrust = false
+			else
+				if(ad>0) then
+					controls.left = false
+					controls.right = true
+					controls.thrust = false
+				end
+			end
+  else
+   controls.left = false
+			controls.right = false
+			--controls.thrust = false
+		local cds=cds(distance(me,it),self.speed)
+		controls.thrust=cds
+  controls.brake=not cds
+		end
+	end
+
+ function cds(dist_to_target,speed)
+		local spring=20
+		local springf = dist_to_target*spring
+		local dampingf = -speed * 2 * sqrt(spring)
+		local force = springf + dampingf
+  return (force > 0) and true or false
+ end
+
 	ship.update = function(self)
 		local angle = self.angle
 		local ax = cos(angle)
@@ -330,9 +371,9 @@ function create_ship(type,system)
 		local yv = self.yv
 		local accel = self.accel
 		local controls = self.controls
-
+		local speed = mysqrt(xv*xv+yv*yv)
+		
 		if controls.thrust then
-			local speed = mysqrt(xv*xv+yv*yv)
 			if(speed<self.maxv) then
 				xv+=ax*self.thrust
 				yv+=ay*self.thrust
@@ -359,7 +400,6 @@ function create_ship(type,system)
 --			if sb_right then
 --				angle -= speed*0.0009
 --			end
-			local speed = mysqrt(xv*xv+yv*yv)
 			if(speed<self.maxv) then
 				xv-=ax*self.revthrust
 				yv-=ay*self.revthrust
@@ -498,6 +538,8 @@ end
 
 -- returns bool,x,y (hit, one point of intersection if hit)
 function line_intersects_convex_poly(x1,y1,x2,y2,poly)
+ -- should really sort poly lines
+ -- near to far from origin of line
 	local hit
 	local hitx
 	local hity
@@ -572,8 +614,8 @@ function _init()
 	system:init()
 	system:populate()
 
-	system.player.x,system.player.y,system.player.angle=system:entry_point()
-
+	--system.player.x,system.player.y,system.player.angle=system:entry_point()
+ system.player.x,system.player.y,system.player.angle=3,22,0
 end
 
 function _draw()
