@@ -72,7 +72,7 @@ function system:update()
 end
 
 function system:populate()
-	local stype='basic'
+	local stype='roids'
 	self.environment={}
 	if(stype=='basic' or stype=='roids') then
 		self.environment = {
@@ -138,11 +138,11 @@ function system:populate()
 		local station=self.environment.station
 		local player=self.player
 		station.angle-=0.005
-  -- check for docking
-  if(distance(vec(player.x,player.y),vec(station.x,station.y))<20 and
+		-- check for docking
+  	if(distance(vec(player.x,player.y),vec(station.x,station.y))<20 and
 					abs(station.angle%1-player.angle%1)<=0.125) then
 			player.exited=true
-  end
+  	end
 	end
 
  self.environment_draw = function(self)
@@ -227,7 +227,7 @@ function system:draw()
 	self.lastcx = cx
 	self.lastcy = cy
 
- self.environment_draw(self)
+	self.environment_draw(self)
 
 	for o in all(self.objects) do
 		o:draw()
@@ -405,9 +405,9 @@ function create_ship(type,system)
 				yv-=ay*self.revthrust
 			end
 		end
-		accel=min(accel,self.boosting and 3 or 2)
-		xv+=ax*accel
-		yv+=ay*accel
+		--accel=min(accel,self.boosting and 3 or 2)
+		--xv+=ax*accel
+		--yv+=ay*accel
 
 		x+=xv*0.3
 		y+=yv*0.3
@@ -458,7 +458,7 @@ function create_ship(type,system)
 		local color = (self.shield==self.maxshield) and self.color or (self.shield > 0 and 12 or (self.hp > 0 and 9 or 4))
 		draw_poly(get_poly(self),color)
 	end
- ship.killed = function(self, killed_by)
+	ship.killed = function(self, killed_by)
 		-- todo add to killer's score
 		del(self.system.objects,self)
 		make_explosion(vec(self.x,self.y,self.xv,self.yv))
@@ -477,27 +477,27 @@ end
 function mysqrt(x)
  -- assume negative values are too large for pico8 int
 	if(x==0) return 0
- if(x < 0 or x > 32760) return 184
+	if(x < 0 or x > 32760) return 184
 	return sqrt(x)
 end
 
 function vecdiff(a,b)
- return { x=a.x-b.x, y=a.y-b.y }
+	return { x=a.x-b.x, y=a.y-b.y }
 end
 
 function distw(x1,y1,x2,y2)
- local a=x1-x2
+	local a=x1-x2
 	local b=y1-y2
- return mysqrt(a*a+b*b)
+	return mysqrt(a*a+b*b)
 end
 
 function distance(a,b)
- return mysqrt(distance2(a,b))
+	 return mysqrt(distance2(a,b))
 end
 
 function distance2(a,b)
- local d = vecdiff(a,b)
- return d.x*d.x+d.y*d.y
+	local d = vecdiff(a,b)
+	return d.x*d.x+d.y*d.y
 end
 
 function fmap(objs,func)
@@ -601,12 +601,12 @@ end
 
 function debug_docking()
 	local p=system.player
- local s=system.environment.station
+	local s=system.environment.station
 	print("debug",0,94,7)
- print("x:"..p.x..",y:"..p.y,0,100,7)
- print("x:"..s.x..",y:"..s.y,0,106,7)
- print("d1:"..(distance(vec(p.x,p.y),vec(s.x,s.y))),0,112,7)
- print("d2:"..distw(p.x,p.y,s.x,s.y),0,120,7)
+	print("x:"..p.x..",y:"..p.y,0,100,7)
+	print("x:"..s.x..",y:"..s.y,0,106,7)
+	print("d1:"..(distance(vec(p.x,p.y),vec(s.x,s.y))),0,112,7)
+	print("d2:"..distw(p.x,p.y,s.x,s.y),0,120,7)
 end
 
 function _init()
