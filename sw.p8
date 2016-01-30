@@ -25,21 +25,22 @@ states.system=system
 states.docked={}
 
 function states.menu:init()
-	states.menu.next_state="system"
+	self.next_state="system"
 end
 
 function states.docked:init()
-	states.menu.next_state="system"
+	self.next_state="system"
+	self.txt={"docked"}
 end
 
 function states.docked:draw()
 	cls()
-	txt={"docked"}
-	str=txt[1]
-	print(str,64-(#str*4/2),64-count(txt)+1*6,7)
+	str=self.txt[1]
+	print(str,64-(#str*4/2),64-count(self.txt)+1*6,7)
 end
 
 function states.docked:update()
+	if (btn(4)) update_state()
 end
 
 function system:init()
@@ -578,7 +579,7 @@ end
 
 function _init()
 	srand(666)
-	state="system"
+	state="docked"
 	for k,v in pairs(states) do v:init() end
 end
 
