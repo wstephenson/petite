@@ -60,15 +60,7 @@ function system:init()
 	self.lastcy=64
 	self.objects={}
 	local p=create_ship('c', self)
-	local q=create_ship('k', self)
-	local r=create_ship('s', self)
 	add(self.objects,p)
-	add(self.objects,q)
-	add(self.objects,r)
-	q.x=25
-	q.y=0
-	r.x=0
-	r.y=-25
 	player.ship=p
 	p.player=player
 	self:populate()
