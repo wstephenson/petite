@@ -313,10 +313,10 @@ function create_ship(type,system)
 	ship.hp=ship.maxhp
 	ship.shield=ship.maxshield
 
-	ship.get_poly = function(self)
+	function ship:get_poly()
 		return fmap(self.verts,function(i) return rotate_point(self.x+i.x,self.y+i.y,self.angle,self.x,self.y) end)
 	end
-	ship.update = function(self)
+	function ship:update()
 		local angle = self.angle
 		local ax = cos(angle)
 		local ay = sin(angle)
@@ -407,7 +407,7 @@ function create_ship(type,system)
 		if (self.timer_shield_recharge>0) self.timer_shield_recharge-=1
 		if (self.timer_shield_recharge==0) self.shield=min(self.shield+1,self.maxshield)
 	end
-	ship.draw = function(self)
+	function ship:draw()
 		local x = self.x
 		local y = self.y
 		local angle = self.angle
@@ -415,9 +415,9 @@ function create_ship(type,system)
 		local v = fmap(self.verts,function(i) return rotate_point(x+i.x,y+i.y,angle,x,y) end)
 		draw_poly(v,color)
 	end
- ship.killed = function(self, killed_by)
+	function ship:killed(killed_by)
 		-- todo add to killer's score
-		del(self.system.objects,self)
+		del(system.objects,self)
 		make_explosion(vec(self.x,self.y,self.xv,self.yv))
 	end
 	return ship
