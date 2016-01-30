@@ -213,6 +213,19 @@ function apply_damage(weapon, subject)
 	if(subject.hp<0) subject:killed(weapon)
 end
 
+-- system
+function debug()
+	local ox=0
+	print("debug",0,94,7)
+	for o in all(system.objects) do
+		hbar(ox,100,16,5,o.hp,o.maxhp,7,'d:')
+		hbar(ox,106,16,5,o.shield,o.maxshield,12,'s:')
+		hbar(ox,112,16,5,o.timer_shield_recharge,shield_recharge_wait,2,'w:')
+		hbar(ox,118,16,5,o.heat,o.maxheat,8,'h:')
+		ox+=30
+	end
+end
+
 function system:draw()
 	local player=self.player
 	cls()
@@ -243,6 +256,7 @@ function system:draw()
 	end
 	camera()
 	print("<"..player.actions[player.curr_action]..'>',10)
+	debug()
 end
 
 --system
@@ -527,19 +541,6 @@ function hbar(x,y,w,h,v,max,color,label)
 	rectfill(x+#label*4,y,x+abswidth,y+h-1,color)
 end
 
--- system
-function debug()
-	local ox=0
-	print("debug",0,94,7)
-	for o in all(system.objects) do
-		hbar(ox,100,16,5,o.hp,o.maxhp,7,'d:')
-		hbar(ox,106,16,5,o.shield,o.maxshield,12,'s:')
-		hbar(ox,112,16,5,o.timer_shield_recharge,shield_recharge_wait,2,'w:')
-		hbar(ox,118,16,5,o.heat,o.maxheat,8,'h:')
-		ox+=30
-	end
-end
-
 function _init()
 	srand(666)
 	system:init()
@@ -548,7 +549,6 @@ end
 
 function _draw()
 	system:draw()
-	debug()
 end
 
 function _update()
