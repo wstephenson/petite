@@ -55,7 +55,7 @@ function states.docked:update()
 end
 
 function system:init()
-	next_state="docked"
+	self.next_state="docked"
 	self.lastcx=64
 	self.lastcy=64
 	self.objects={}
