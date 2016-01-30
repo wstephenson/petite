@@ -32,6 +32,16 @@ function states.docked:init()
 	states.menu.next_state="system"
 end
 
+function states.docked:draw()
+	cls()
+	txt={"docked"}
+	str=txt[1]
+	print(str,64-(#str*4/2),64-count(txt)+1*6,7)
+end
+
+function states.docked:update()
+end
+
 function system:init()
 	next_state="docked"
 	self.lastcx=64
@@ -56,6 +66,7 @@ function system:update()
  -- indicate docked state for now
 	if(player.exited)then
 		player.color=4
+		update_state()
 	end
 	-- enter input
 	local controls=player.ship.controls
