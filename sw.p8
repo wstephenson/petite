@@ -572,11 +572,11 @@ function _init()
 end
 
 function _draw()
-	system:draw()
+	states[state]:draw()
 end
 
 function _update()
-	system:update()
+	states[state]:update()
 	for p in all(particles) do
 		p.x += p.xv
 		p.y += p.yv
