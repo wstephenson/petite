@@ -67,11 +67,6 @@ function system:init()
 end
 
 function system:update()
- -- indicate docked state for now
-	if(player.exited)then
-		player.ship.color=4
-		update_state()
-	end
 	-- enter input
 	local controls=player.ship.controls
 	controls.left = btn(0)
@@ -167,7 +162,7 @@ function system:environment_update()
 	-- check for docking
 	if(distance(vec(player.ship.x,player.ship.y),vec(station.x,station.y))<20 and
 			abs(station.angle%1-player.ship.angle%1)<=0.125) then
-		player.exited=true
+		update_state()
  end
 end
 
@@ -577,6 +572,7 @@ function update_state()
 	local next_state=states[state].next_state
 	if(next_state)then
 		state=next_state
+		states[state]:init()
 	end
 end
 
