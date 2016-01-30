@@ -30,13 +30,22 @@ end
 
 function states.docked:init()
 	self.next_state="system"
-	self.txt={"docked"}
+	self.txt={"docked",
+			"system: zelada",
+			"score:"..player.score,
+			"rank: harmless",
+			"",
+			"press z to launch"}
 end
 
 function states.docked:draw()
 	cls()
-	str=self.txt[1]
-	print(str,64-(#str*4/2),64-count(self.txt)+1*6,7)
+	map(0,0,0,0,16,16)
+	local i=0
+	foreach(self.txt,function(str) 
+			print(str,64-(#str*4/2),64-count(self.txt)+i*6,7)
+			i+=1
+		end)
 end
 
 function states.docked:update()
