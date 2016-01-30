@@ -31,6 +31,7 @@ function system:init()
 	r.x=0
 	r.y=-25
 	player.ship=p
+	p.player=player
 end
 
 function system:update()
@@ -166,7 +167,7 @@ function check_laser_hit(laser,object)
 		make_explosion(vec(hx,hy),object.xv,object.yv)
 		laser.spent=true
 		laser.ttl-=1
-		apply_damage('l', object)
+		apply_damage(laser, object)
 	end
 end
 
@@ -183,7 +184,7 @@ function check_torp_hit(torp,object)
 	if(hit) then
 		make_explosion(vec(hx,hy),(torp.xv+object.xv)/4,(torp.yv+object.yv)/4)
 		del(torps,torp)
-		apply_damage('t', object)
+		apply_damage(torp, object)
 	end
 end
 
@@ -191,7 +192,7 @@ end
 -- all weapons damage equally
 function apply_damage(weapon, subject)
 	local dmg
-	if(weapon=='l')then
+	if(weapon.type=='l')then
 		dmg=dmg_laser
 	else --torp
 		dmg=dmg_torp
@@ -372,13 +373,13 @@ function create_ship(type,system)
 		if(controls.action) then
 			if(self.actions[self.curr_action] == 'l') then
 				if(self.heat<self.maxheat) then
-					add(lasers,{origin=ship,range=self.laser_range,angle=self.angle,color=8,ttl=5,spent=false})
+					add(lasers,{type='l',origin=ship,range=self.laser_range,angle=self.angle,color=8,ttl=5,spent=false})
 					self.heat+=heat_laser
 				end
 			end
 			if(self.actions[self.curr_action] == 'm') then
 				if(self.heat<self.maxheat) then
-					add(torps,{origin=ship,x=self.x,y=self.y,angle=self.angle,xv=self.xv+speed_torp*cos(angle),yv=self.yv+speed_torp*sin(angle),ttl=30})
+					add(torps,{type='m',origin=ship,x=self.x,y=self.y,angle=self.angle,xv=self.xv+speed_torp*cos(angle),yv=self.yv+speed_torp*sin(angle),ttl=30})
 					self.heat+=heat_torp
 				end
 			end
@@ -414,8 +415,8 @@ function create_ship(type,system)
 		draw_poly(v,color)
 	end
  ship.killed = function(self, killed_by)
-		-- todo add to killer's score
-		del(self.system.objects,self)
+		if(killed_by.origin.player)player.score+=1
+		del(system.objects,self)
 		make_explosion(vec(self.x,self.y,self.xv,self.yv))
 	end
 	return ship
