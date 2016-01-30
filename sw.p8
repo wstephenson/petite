@@ -1,8 +1,10 @@
 pico-8 cartridge // http://www.pico-8.com
 version 5
 __lua__
--- vim: set ft=lua ts=1 sw=1 noet:
+-- PETITE: TINY CMDR
+-- BY WSTEPHENSON
 -- using picoracer-2048 code
+-- vim: set ft=lua ts=1 sw=1 noet:
 player={}
 player.score=0
 lasers={}
