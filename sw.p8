@@ -154,14 +154,6 @@ function system:environment_draw()
 	end
 end
 
--- utility
-function age_transient(transient,array)
-	transient.ttl-=1
-		if transient.ttl < 0 then
-			del(array,transient)
-		end
-end
-
 -- system
 function check_laser_hit(laser,object)
 	if(laser.origin==object or laser.spent==true)return
@@ -439,6 +431,13 @@ function make_explosion(point,xv,yv)
 	for i=1,8 do
 		add(particles,{x=point.x,y=point.y,xv=xv+rnd(2)-1,yv=yv+rnd(2)-1,ttl=20})
 	end
+end
+
+function age_transient(transient,array)
+	transient.ttl-=1
+		if transient.ttl < 0 then
+			del(array,transient)
+		end
 end
 
 function mysqrt(x)
