@@ -3,6 +3,7 @@ version 4
 __lua__
 -- vim: set ft=lua ts=1 sw=1 noet:
 -- using picoracer-2048 code
+player={}
 lasers={}
 system={}
 torps={}
@@ -28,24 +29,22 @@ function system:init()
 	q.y=0
 	r.x=0
 	r.y=-25
-	self.player=p
+	player.ship=p
 end
 
 function system:update()
-	local player = self.player
  -- indicate docked state for now
 	if(player.exited)then
 		player.color=4
 	end
 	-- enter input
-	if player then
-		player.controls.left = btn(0)
-		player.controls.right = btn(1)
-		player.controls.action = btnp(4)
-		player.controls.select = btnp(5)
-		player.controls.thrust = btn(2)
-		player.controls.brake = btn(3)
-	end
+	local controls=player.ship.controls
+	controls.left = btn(0)
+	controls.right = btn(1)
+	controls.action = btnp(4)
+	controls.select = btnp(5)
+	controls.thrust = btn(2)
+	controls.brake = btn(3)
 	for o in all(self.objects) do
 		o:update()
 	end
@@ -122,18 +121,16 @@ function system:populate()
 	end
 	local entry_body = self.environment.sun
 	local entry_angle=0.125
-	local player=self.player
-	player.x=entry_body.x+entry_body.r*1.5*cos(entry_angle)
-	player.y=entry_body.y+entry_body.r*1.5*sin(entry_angle)
-	player.angle=entry_angle
+	player.ship.x=entry_body.x+entry_body.r*1.5*cos(entry_angle)
+	player.ship.y=entry_body.y+entry_body.r*1.5*sin(entry_angle)
+	player.ship.angle=entry_angle
 end
 
 function system:environment_update()
 	local station=self.environment.station
-	local player=self.player
 	station.angle-=0.005
 	-- check for docking
-	if(distance(vec(player.x,player.y),vec(station.x,station.y))<20 and
+	if(distance(vec(player.ship.x,player.ship.y),vec(station.x,station.y))<20 and
 			abs(station.angle%1-player.angle%1)<=0.125) then
 		player.exited=true
  end
@@ -220,11 +217,11 @@ function system:debug()
 end
 
 function system:draw()
-	local player=self.player
 	cls()
 	local cx,cy
-	cx=player.x-64
-	cy=player.y-64
+	local pship=player.ship
+	cx=pship.x-64
+	cy=pship.y-64
 	camera(lerp(self.lastcx,cx,0.5),lerp(self.lastcy,cy,0.5))
 	self.lastcx = cx
 	self.lastcy = cy
@@ -248,7 +245,7 @@ function system:draw()
 		line(p.x,p.y,p.x-p.xv,p.y-p.yv,p.ttl > 12 and 10 or (p.ttl > 7 and 9 or 8))
 	end
 	camera()
-	print("<"..player.actions[player.curr_action]..'>',10)
+	print("<"..pship.actions[pship.curr_action]..'>',10)
 	self:debug()
 end
 
