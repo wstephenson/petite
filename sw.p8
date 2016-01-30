@@ -4,6 +4,7 @@ __lua__
 -- vim: set ft=lua ts=1 sw=1 noet:
 -- using picoracer-2048 code
 player={}
+player.score=0
 lasers={}
 system={}
 torps={}
@@ -206,7 +207,7 @@ end
 -- system
 function system:debug()
 	local ox=0
-	print("debug",0,94,7)
+	print("score:"..player.score,0,94,7)
 	for o in all(self.objects) do
 		hbar(ox,100,16,5,o.hp,o.maxhp,7,'d:')
 		hbar(ox,106,16,5,o.shield,o.maxshield,12,'s:')
