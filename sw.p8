@@ -126,30 +126,31 @@ function system:populate()
 	player.x=entry_body.x+entry_body.r*1.5*cos(entry_angle)
 	player.y=entry_body.y+entry_body.r*1.5*sin(entry_angle)
 	player.angle=entry_angle
+end
 
-	self.environment_update=function(self)
-		local station=self.environment.station
-		station.angle-=0.005
-  -- check for docking
-  if(distance(vec(player.x,player.y),vec(station.x,station.y))<20 and
-					abs(station.angle%1-player.angle%1)<=0.125) then
-			player.exited=true
-  end
-	end
+function system:environment_update()
+	local station=self.environment.station
+	local player=self.player
+	station.angle-=0.005
+	-- check for docking
+	if(distance(vec(player.x,player.y),vec(station.x,station.y))<20 and
+			abs(station.angle%1-player.angle%1)<=0.125) then
+		player.exited=true
+ end
+end
 
- self.environment_draw = function(self)
-		local env=self.environment
-		local sun=env.sun
-		local station=env.station
-		local planet=env.planet
+function system:environment_draw()
+	local env=self.environment
+	local sun=env.sun
+	local station=env.station
+	local planet=env.planet
 
-		circ(sun.x,sun.y,sun.r+rnd(1)-0.5,sun.color)
-		circ(planet.x,planet.y,planet.r,planet.color)
-		local poly=fmap(station.verts,function(i) return rotate_point(station.x+i.x,station.y+i.y,station.angle,station.x,station.y) end)
-		draw_poly(poly,station.color)
-		if(env.stype=='roids')then
-			foreach(env.roids, function(r) circ(r.x, r.y, r.r, 5) end)
-		end
+	circ(sun.x,sun.y,sun.r+rnd(1)-0.5,sun.color)
+	circ(planet.x,planet.y,planet.r,planet.color)
+	local poly=fmap(station.verts,function(i) return rotate_point(station.x+i.x,station.y+i.y,station.angle,station.x,station.y) end)
+	draw_poly(poly,station.color)
+	if(env.stype=='roids')then
+		foreach(env.roids, function(r) circ(r.x, r.y, r.r, 5) end)
 	end
 end
 
