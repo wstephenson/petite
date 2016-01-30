@@ -69,7 +69,7 @@ end
 function system:update()
  -- indicate docked state for now
 	if(player.exited)then
-		player.color=4
+		player.ship.color=4
 		update_state()
 	end
 	-- enter input
