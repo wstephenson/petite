@@ -153,6 +153,7 @@ function system:populate()
 	end
 end
 
+-- utility
 function age_transient(transient,array)
 	transient.ttl-=1
 		if transient.ttl < 0 then
@@ -160,6 +161,7 @@ function age_transient(transient,array)
 		end
 end
 
+-- system
 function check_laser_hit(laser,object)
 	if(laser.origin==object or laser.spent==true)return
 	local hit
@@ -177,6 +179,7 @@ function check_laser_hit(laser,object)
 	end
 end
 
+-- system
 function check_torp_hit(torp,object)
 	if(torp.origin==object) return
 	local hit
@@ -193,6 +196,7 @@ function check_torp_hit(torp,object)
 	end
 end
 
+-- system
 -- all weapons damage equally
 function apply_damage(weapon, subject)
 	local dmg
@@ -241,6 +245,8 @@ function system:draw()
 	print("<"..player.actions[player.curr_action]..'>',10)
 end
 
+--system
+--puts a lot of methods onto the ship
 function create_ship(type,system)
 	local ship = {
 		x=0,
@@ -409,7 +415,9 @@ function create_ship(type,system)
 	end
 	return ship
 end
+-- end of create ship
 
+-- utility
 function make_explosion(point,xv,yv)
 	xv=xv or 0
 	yv=yv or 0
@@ -519,6 +527,7 @@ function hbar(x,y,w,h,v,max,color,label)
 	rectfill(x+#label*4,y,x+abswidth,y+h-1,color)
 end
 
+-- system
 function debug()
 	local ox=0
 	print("debug",0,94,7)
