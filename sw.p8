@@ -63,7 +63,7 @@ function system:update()
 			check_torp_hit(t,o)
 		end
 	end
-	self.environment_update(self)
+	self:environment_update()
 end
 
 function system:populate()
@@ -207,10 +207,10 @@ function apply_damage(weapon, subject)
 end
 
 -- system
-function debug()
+function system:debug()
 	local ox=0
 	print("debug",0,94,7)
-	for o in all(system.objects) do
+	for o in all(self.objects) do
 		hbar(ox,100,16,5,o.hp,o.maxhp,7,'d:')
 		hbar(ox,106,16,5,o.shield,o.maxshield,12,'s:')
 		hbar(ox,112,16,5,o.timer_shield_recharge,shield_recharge_wait,2,'w:')
@@ -229,7 +229,7 @@ function system:draw()
 	self.lastcx = cx
 	self.lastcy = cy
 
- self.environment_draw(self)
+ self:environment_draw()
 
 	for o in all(self.objects) do
 		o:draw()
@@ -249,7 +249,7 @@ function system:draw()
 	end
 	camera()
 	print("<"..player.actions[player.curr_action]..'>',10)
-	debug()
+	self:debug()
 end
 
 --system
