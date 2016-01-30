@@ -15,8 +15,25 @@ heat_torp=60
 dmg_laser=20
 dmg_torp=60
 shield_recharge_wait=150 -- 5 seconds
+--current game state
+state=nil
+--table of all game states
+states={}
+--default states
+states.menu={}
+states.system=system
+states.docked={}
+
+function states.menu:init()
+	states.menu.next_state="system"
+end
+
+function states.docked:init()
+	states.menu.next_state="system"
+end
 
 function system:init()
+	next_state="docked"
 	self.lastcx=64
 	self.lastcy=64
 	self.objects={}
@@ -32,6 +49,7 @@ function system:init()
 	r.y=-25
 	player.ship=p
 	p.player=player
+	self:populate()
 end
 
 function system:update()
@@ -540,10 +558,17 @@ function hbar(x,y,w,h,v,max,color,label)
 	rectfill(x+#label*4,y,x+abswidth,y+h-1,color)
 end
 
+function update_state()
+	local next_state=states[state].next_state
+	if(next_state)then
+		state=next_state
+	end
+end
+
 function _init()
 	srand(666)
-	system:init()
-	system:populate()
+	state="system"
+	for k,v in pairs(states) do v:init() end
 end
 
 function _draw()
