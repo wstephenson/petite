@@ -73,6 +73,14 @@ function system:init()
 	self.lastcy=64
 	self.objects={}
 	add(self.objects,player.ship)
+	local q=create_ship('k', self)
+	local r=create_ship('s', self)
+	add(self.objects,q)
+	add(self.objects,r)
+	q.x=25
+	q.y=0
+	r.x=0
+	r.y=-25
 	player.ship.system=self
 	self:populate()
 end
@@ -202,6 +210,7 @@ function system:environment_draw()
 	local station=env.station
 	local planet=env.planet
 
+	rect(-map_size,-map_size,map_size,map_size,14)
 	circ(sun.x,sun.y,sun.r+rnd(1)-0.5,sun.color)
 	circ(planet.x,planet.y,planet.r,planet.color)
 	local poly=fmap(station.verts,function(i) return rotate_point(station.x+i.x,station.y+i.y,station.angle,station.x,station.y) end)
