@@ -7,9 +7,9 @@ Player object(persistent over state)
  Score (done)
 Fuel scooping (done)
  Rate dependent on velocity and distance to star (done)
-Stellar heating (in progress)
+Stellar heating (needs balance)
  Rate dependent on distance to star (done)
- Heat according to inverse square of distance to star
+ Heat according to inverse square of distance to star (done)
 UI for when docked (in progress)
  Ship repair
  Ship upgrade
