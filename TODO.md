@@ -6,7 +6,8 @@ Player object(persistent over state)
  Rank
  Score (done)
 Stellar heating (in progress)
- Rate dependent on distance to star (and ship mass?)
+ Rate dependent on distance to star (done)
+ Heat according to inverse square of distance to star
 UI for when docked (in progress)
  Ship repair
  Ship upgrade
