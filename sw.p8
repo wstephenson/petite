@@ -70,6 +70,7 @@ function system:init()
 end
 
 function system:update()
+	player.ship.fuel-=1
 	-- enter input
 	local controls=player.ship.controls
 	controls.left = btn(0)
@@ -97,6 +98,7 @@ function system:update()
 			if(o.hp<=0)self:killed(t,o)
 		end
 	end
+	if(player.ship.fuel<=0)self:killed(nil,player.ship)
 	self:environment_update()
 end
 
@@ -248,6 +250,7 @@ function system:debug()
 		hbar(ox,118,16,5,o.heat,o.maxheat,8,'h:')
 		ox+=30
 	end
+	hbar(0,123,123,1,player.ship.fuel,10000,8,'')
 end
 
 function system:draw()
@@ -359,6 +362,7 @@ function create_ship(type)
 		local controls = self.controls
 
 		if controls.thrust then
+			player.ship.fuel-=10
 			local speed = mysqrt(xv*xv+yv*yv)
 			if(speed<self.maxv) then
 				xv+=ax*self.thrust
@@ -451,7 +455,7 @@ end
 -- end of create ship
 
 function system:killed(subject, object)
-	if(subject.origin.player)player.score+=1
+	if(subject and subject.origin.player)player.score+=1
 	del(self.objects,object)
 	make_explosion(vec(object.x,object.y,object.xv,object.yv))
 end
