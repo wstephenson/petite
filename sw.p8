@@ -15,6 +15,8 @@ heat_laser=30
 heat_torp=60
 dmg_laser=20
 dmg_torp=60
+stellar_radius_scoop_max=1.35
+scoop_max=30
 shield_recharge_wait=150 -- 5 seconds
 --current game state
 state=nil
@@ -171,6 +173,14 @@ function system:environment_update()
 			abs(station.angle%1-player.ship.angle%1)<=0.05) then
 		update_state()
  end
+	-- if player is within scooping range, scoop fuel dependent on velocity
+	local sun = self.environment.sun
+	player.scooping=(distance(vec(player.ship.x,player.ship.y),vec(sun.x,sun.y))<sun.r*stellar_radius_scoop_max)
+	if(player.scooping)then
+		local speed = mysqrt(player.ship.xv*player.ship.xv+player.ship.yv*player.ship.yv)
+		local fuel=scoop_max*speed/player.ship.maxv
+		player.ship.fuel=min(player.ship.fuel+fuel,10000)
+	end
 end
 
 function system:environment_draw()
@@ -243,6 +253,9 @@ end
 function system:debug()
 	local ox=0
 	print("score:"..player.score,0,94,7)
+	if(player.scooping)then
+		print("scooping",44,64,2)
+	end
 	for o in all(self.objects) do
 		hbar(ox,100,16,5,o.hp,o.maxhp,7,'d:')
 		hbar(ox,106,16,5,o.shield,o.maxshield,12,'s:')

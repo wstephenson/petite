@@ -5,8 +5,8 @@ Player object(persistent over state)
  Ship fuel
  Rank
  Score (done)
-Fuel scooping
- Rate dependent on velocity and distance to star
+Fuel scooping (done)
+ Rate dependent on velocity and distance to star (done)
 UI for when docked (in progress)
  Ship repair
  Ship upgrade
