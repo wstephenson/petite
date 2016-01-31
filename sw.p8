@@ -67,6 +67,7 @@ function system:init()
 	self.lastcy=64
 	self.objects={}
 	add(self.objects,player.ship)
+	player.ship.system=self
 	self:populate()
 end
 
@@ -233,13 +234,17 @@ function check_torp_hit(torp,object)
 end
 
 -- system
--- all weapons damage equally
 function apply_damage(weapon, subject)
 	local dmg
 	if(weapon.type=='l')then
 		dmg=dmg_laser
-	else --torp
-		dmg=dmg_torp
+	else
+		if(weapon.type=='h')then
+			local excessheat=subject.heat-subject.maxheat
+			dmg=max(0,excessheat)/50
+		else --torp
+			dmg=dmg_torp
+		end
 	end
 	local old_shield=subject.shield
 	local dmg_to_hull=min(0,subject.shield-dmg)
@@ -443,6 +448,8 @@ function create_ship(type)
 		self.angle = angle
 		-- heat
 		self.heat=max(0,self.heat-1)
+		apply_damage({type='h'}, self)
+		if(self.hp<=0)self.system:killed({origin=nil},self)
 		-- shields
 		--self.timer_shield_recharge+=1
 		self.timer_shield_recharge=max(0,self.timer_shield_recharge-1)
@@ -462,7 +469,7 @@ end
 -- end of create ship
 
 function system:killed(subject, object)
-	if(subject.origin.player)player.score+=1
+	if(subject and subject.origin==player.ship)player.score+=1
 	del(self.objects,object)
 	make_explosion(vec(object.x,object.y,object.xv,object.yv))
 end
