@@ -13,10 +13,13 @@ particles={}
 speed_torp=5
 heat_laser=30
 heat_torp=60
+heat_sun=10
 dmg_laser=20
 dmg_torp=60
 stellar_radius_scoop_max=1.35
 scoop_max=30
+stellar_radius_safe=1.4
+stellar_radius_crit=1.05
 shield_recharge_wait=150 -- 5 seconds
 --current game state
 state=nil
@@ -68,6 +71,7 @@ function system:init()
 	self.lastcy=64
 	self.objects={}
 	add(self.objects,player.ship)
+	player.ship.system=self
 	self:populate()
 end
 
@@ -167,6 +171,7 @@ end
 
 function system:environment_update()
 	local station=self.environment.station
+	local sun=self.environment.sun
 	station.angle-=0.005
 	-- check for docking
 	if(distance(vec(player.ship.x,player.ship.y),vec(station.x,station.y))<20 and
@@ -174,13 +179,19 @@ function system:environment_update()
 		update_state()
  end
 	-- if player is within scooping range, scoop fuel dependent on velocity
-	local sun = self.environment.sun
-	player.scooping=(distance(vec(player.ship.x,player.ship.y),vec(sun.x,sun.y))<sun.r*stellar_radius_scoop_max)
+	local pship=player.ship
+	player.scooping=(distance(vec(pship.x,pship.y),vec(sun.x,sun.y))<sun.r*stellar_radius_scoop_max)
 	if(player.scooping)then
-		local speed = mysqrt(player.ship.xv*player.ship.xv+player.ship.yv*player.ship.yv)
-		local fuel=scoop_max*speed/player.ship.maxv
-		player.ship.fuel=min(player.ship.fuel+fuel,10000)
+		local speed = mysqrt(pship.xv*pship.xv+pship.yv*pship.yv)
+		local fuel=scoop_max*speed/pship.maxv
+		pship.fuel=min(pship.fuel+fuel,10000)
 	end
+	-- ship heating
+	local dist_player2star=distance(vec(pship.x,pship.y),vec(sun.x,sun.y))
+	local dist_safe=sun.r*stellar_radius_safe
+	local dist_crit=sun.r*stellar_radius_crit
+	local heat_strength=1-clamp((dist_player2star-dist_crit)/(dist_safe-dist_crit),0,1)
+	pship.heat+=heat_sun*heat_strength
 end
 
 function system:environment_draw()
@@ -234,13 +245,17 @@ function check_torp_hit(torp,object)
 end
 
 -- system
--- all weapons damage equally
 function apply_damage(weapon, subject)
 	local dmg
 	if(weapon.type=='l')then
 		dmg=dmg_laser
-	else --torp
-		dmg=dmg_torp
+	else
+		if(weapon.type=='h')then
+			local excessheat=subject.heat-subject.maxheat
+			dmg=max(0,excessheat)/50
+		else --torp
+			dmg=dmg_torp
+		end
 	end
 	local old_shield=subject.shield
 	local dmg_to_hull=min(0,subject.shield-dmg)
@@ -450,6 +465,8 @@ function create_ship(type)
 		self.angle = angle
 		-- heat
 		self.heat=max(0,self.heat-1)
+		apply_damage({type='h'}, self)
+		if(self.hp<=0)self.system:killed({origin=nil},self)
 		-- shields
 		--self.timer_shield_recharge+=1
 		self.timer_shield_recharge=max(0,self.timer_shield_recharge-1)
@@ -469,12 +486,16 @@ end
 -- end of create ship
 
 function system:killed(subject, object)
-	if(subject and subject.origin.player)player.score+=1
+	if(subject and subject.origin==player.ship)player.score+=1
 	del(self.objects,object)
 	make_explosion(vec(object.x,object.y,object.xv,object.yv))
 end
 
 -- utility
+function clamp(val,minv,maxv)
+	return max(minv,min(val,maxv))
+end
+
 function draw_ui(txt)
 	cls()
 	map(0,0,0,0,16,16)
