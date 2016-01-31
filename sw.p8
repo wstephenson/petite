@@ -362,7 +362,7 @@ function create_ship(type)
 		local controls = self.controls
 
 		if controls.thrust then
-			player.ship.fuel-=self.thrust*50
+			if(self==player.ship)player.ship.fuel-=self.thrust*50
 			local speed = mysqrt(xv*xv+yv*yv)
 			if(speed<self.maxv) then
 				xv+=ax*self.thrust
@@ -376,7 +376,7 @@ function create_ship(type)
 		local sb_left
 		local sb_right
 		if controls.brake then
-		 player.ship.fuel-=self.revthrust*50
+		 if(self==player.ship)player.ship.fuel-=self.revthrust*50
 --			if controls.left then
 --				sb_left = true
 --			elseif controls.right then
