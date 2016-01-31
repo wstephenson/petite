@@ -27,7 +27,20 @@ states.system=system
 states.docked={}
 
 function states.menu:init()
-	self.next_state="system"
+	self.next_state="docked"
+	self.txt={"petite",
+			"tiny cmdr",
+			"",
+			"start new cmdr",
+			"(z/x)"}
+end
+
+function states.menu:draw()
+	draw_ui(self.txt)
+end
+
+function states.menu:update()
+	if (btnp(4)) update_state()
 end
 
 function states.docked:init()
@@ -41,17 +54,11 @@ function states.docked:init()
 end
 
 function states.docked:draw()
-	cls()
-	map(0,0,0,0,16,16)
-	local i=0
-	foreach(self.txt,function(str) 
-			print(str,64-(#str*4/2),64-(count(self.txt)/2)*6+i*6,7)
-			i+=1
-		end)
+	draw_ui(self.txt)
 end
 
 function states.docked:update()
-	if (btn(4)) update_state()
+	if (btnp(4)) update_state()
 end
 
 function system:init()
@@ -452,6 +459,16 @@ end
 -- end of create ship
 
 -- utility
+function draw_ui(txt)
+	cls()
+	map(0,0,0,0,16,16)
+	local i=0
+	foreach(txt,function(str) 
+			print(str,64-(#str*4/2),64-(count(txt)/2)*6+i*6,7)
+			i+=1
+		end)
+end
+
 function make_explosion(point,xv,yv)
 	xv=xv or 0
 	yv=yv or 0
@@ -578,7 +595,7 @@ end
 
 function _init()
 	srand(666)
-	state="docked"
+	state="menu"
 	for k,v in pairs(states) do v:init() end
 end
 
