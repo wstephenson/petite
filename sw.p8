@@ -6,7 +6,6 @@ __lua__
 -- using picoracer-2048 code
 -- vim: set ft=lua ts=1 sw=1 noet:
 player={}
-player.score=0
 lasers={}
 system={}
 torps={}
@@ -66,10 +65,7 @@ function system:init()
 	self.lastcx=64
 	self.lastcy=64
 	self.objects={}
-	local p=create_ship('c', self)
-	add(self.objects,p)
-	player.ship=p
-	p.player=player
+	add(self.objects,player.ship)
 	self:populate()
 end
 
@@ -88,6 +84,7 @@ function system:update()
 	for l in all(lasers) do
 		for o in all(self.objects) do
 			check_laser_hit(l,o)
+			if(o.hp<=0)self:killed(l,o)
 		end
 		age_transient(l,lasers)
 	end
@@ -97,6 +94,7 @@ function system:update()
 		t.y+=t.yv
 		for o in all(self.objects) do
 			check_torp_hit(t,o)
+			if(o.hp<=0)self:killed(t,o)
 		end
 	end
 	self:environment_update()
@@ -237,7 +235,6 @@ function apply_damage(weapon, subject)
 	subject.shield=max(0,subject.shield-dmg)
 	if (old_shield > 0 and subject.shield == 0 and subject.timer_shield_recharge == 0) subject.timer_shield_recharge = shield_recharge_wait
 	subject.hp+=dmg_to_hull
-	if(subject.hp<0) subject:killed(weapon)
 end
 
 -- system
@@ -288,7 +285,7 @@ end
 
 --system
 --puts a lot of methods onto the ship
-function create_ship(type,system)
+function create_ship(type)
 	local ship = {
 		x=0,
 		y=0,
@@ -449,14 +446,15 @@ function create_ship(type,system)
 		local v = fmap(self.verts,function(i) return rotate_point(x+i.x,y+i.y,angle,x,y) end)
 		draw_poly(v,color)
 	end
-	function ship:killed(killed_by)
-		if(killed_by.origin.player)player.score+=1
-		del(system.objects,self)
-		make_explosion(vec(self.x,self.y,self.xv,self.yv))
-	end
 	return ship
 end
 -- end of create ship
+
+function system:killed(subject, object)
+	if(subject.origin.player)player.score+=1
+	del(self.objects,object)
+	make_explosion(vec(object.x,object.y,object.xv,object.yv))
+end
 
 -- utility
 function draw_ui(txt)
@@ -596,6 +594,11 @@ end
 function _init()
 	srand(666)
 	state="menu"
+	local p=create_ship('c')
+	p.fuel=10000
+	player.score=0
+	player.ship=p
+	p.player=player
 	for k,v in pairs(states) do v:init() end
 end
 
