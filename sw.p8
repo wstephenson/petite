@@ -161,7 +161,7 @@ function system:environment_update()
 	station.angle-=0.005
 	-- check for docking
 	if(distance(vec(player.ship.x,player.ship.y),vec(station.x,station.y))<20 and
-			abs(station.angle%1-player.ship.angle%1)<=0.125) then
+			abs(station.angle%1-player.ship.angle%1)<=0.05) then
 		update_state()
  end
 end
