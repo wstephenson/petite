@@ -10,6 +10,7 @@ lasers={}
 system={}
 torps={}
 particles={}
+max_val=128
 speed_torp=5
 heat_laser=30
 heat_torp=60
@@ -532,10 +533,24 @@ function vecdiff(a,b)
  return { x=a.x-b.x, y=a.y-b.y }
 end
 
-function distance(a,b)
+-- this works without overflow
+function distance(a, b)
+ local dx = a.x-b.x
+ local dy = a.y-b.y
+ dx*=dx
+ dy*=dy
+ local sum=dx+dy
+ -- check for overflows
+ if (dx<0 or dy<0 or sum<0) return max_val
+ return sqrt(sum)
+end
+
+-- this overflows
+function naive_distance(a,b)
  return mysqrt(distance2(a,b))
 end
 
+-- this is only useful for comparison
 function distance2(a,b)
  local d = vecdiff(a,b)
  return d.x*d.x+d.y*d.y
