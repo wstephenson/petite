@@ -482,6 +482,11 @@ function create_ship(type)
 		-- heat
 		self.heat=max(0,self.heat-1)
 		apply_damage({type='h'}, self)
+		-- enforce boundaries via heat
+		if(x<-map_size or x>map_size or y<-map_size or y>map_size)then
+			self.heat+=5
+		end
+		apply_damage({type='h'}, self)
 		if(self.hp<=0)self.system:killed({origin=nil},self)
 		-- shields
 		--self.timer_shield_recharge+=1
