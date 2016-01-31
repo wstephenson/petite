@@ -235,7 +235,7 @@ function check_torp_hit(torp,object)
 	local hx
 	local hy
 	local x = torp.x+4*cos(torp.angle+0.5)
-	local y = torp.x+4*sin(torp.angle+0.5)
+	local y = torp.y+4*sin(torp.angle+0.5)
 	local poly = object:get_poly()
 	hit,hx,hy=line_intersects_convex_poly(torp.x,torp.y,x,y,poly)
 	if(hit) then
