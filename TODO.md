@@ -1,10 +1,12 @@
 Game loop (in progress)
 
 Player object(persistent over state)
- Ship damage
+ Ship damage (in progress)
  Ship fuel
  Rank
  Score (done)
+Stellar heating (in progress)
+ Rate dependent on distance to star (and ship mass?)
 UI for when docked (in progress)
  Ship repair
  Ship upgrade
