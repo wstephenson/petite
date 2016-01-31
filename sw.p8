@@ -16,6 +16,8 @@ heat_torp=60
 heat_sun=10
 dmg_laser=20
 dmg_torp=60
+stellar_radius_safe=1.4
+stellar_radius_crit=1.05
 shield_recharge_wait=150 -- 5 seconds
 --current game state
 state=nil
@@ -173,14 +175,11 @@ function system:environment_update()
 		update_state()
  end
  -- ship heating
-	local dist2sun=distance(vec(player.ship.x,player.ship.y),vec(sun.x,sun.y))
-	if(dist2sun<sun.r*1.3)then
-		if(dist2sun<sun.r*1.05)then
-			player.ship.heat+=3*heat_sun
-		else
-			player.ship.heat+=heat_sun
-		end
-	end
+	local dist_player2star=distance(vec(player.ship.x,player.ship.y),vec(sun.x,sun.y))
+	local dist_safe=sun.r*stellar_radius_safe
+	local dist_crit=sun.r*stellar_radius_crit
+	local heat_strength=1-clamp((dist_player2star-dist_crit)/(dist_safe-dist_crit),0,1)
+	player.ship.heat+=heat_sun*heat_strength
 end
 
 function system:environment_draw()
@@ -475,6 +474,10 @@ function system:killed(subject, object)
 end
 
 -- utility
+function clamp(val,minv,maxv)
+	return max(minv,min(val,maxv))
+end
+
 function draw_ui(txt)
 	cls()
 	map(0,0,0,0,16,16)
