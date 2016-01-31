@@ -13,6 +13,7 @@ particles={}
 speed_torp=5
 heat_laser=30
 heat_torp=60
+heat_sun=10
 dmg_laser=20
 dmg_torp=60
 shield_recharge_wait=150 -- 5 seconds
@@ -163,12 +164,22 @@ end
 
 function system:environment_update()
 	local station=self.environment.station
+	local sun=self.environment.sun
 	station.angle-=0.005
 	-- check for docking
 	if(distance(vec(player.ship.x,player.ship.y),vec(station.x,station.y))<20 and
 			abs(station.angle%1-player.ship.angle%1)<=0.05) then
 		update_state()
  end
+ -- ship heating
+	local dist2sun=distance(vec(player.ship.x,player.ship.y),vec(sun.x,sun.y))
+	if(dist2sun<sun.r*1.3)then
+		if(dist2sun<sun.r*1.05)then
+			player.ship.heat+=3*heat_sun
+		else
+			player.ship.heat+=heat_sun
+		end
+	end
 end
 
 function system:environment_draw()
