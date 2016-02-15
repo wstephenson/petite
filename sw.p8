@@ -23,6 +23,11 @@ scoop_max=30
 stellar_radius_safe=1.4
 stellar_radius_crit=1.05
 shield_recharge_wait=150 -- 5 seconds
+--galaxy map
+--seeds
+w0=0x5a4a
+w1=0x0248
+w2=0xb753
 --current game state
 state=nil
 --table of all game states
@@ -31,6 +36,7 @@ states={}
 states.menu={}
 states.system=system
 states.docked={}
+states.map={}
 
 function states.menu:init()
 	self.next_state="docked"
@@ -50,7 +56,7 @@ function states.menu:update()
 end
 
 function states.docked:init()
-	self.next_state="system"
+	self.next_state="map"
 	self.txt={"docked",
 			"system: zelada",
 			"score:"..player.score,
@@ -65,6 +71,37 @@ end
 
 function states.docked:update()
 	if (btnp(4)) update_state()
+end
+
+function states.map:init()
+	cls()
+	self.next_state="system"
+	--map
+	self.d={}
+
+	for i=0,15 do
+		self.d[i]={}
+		for j=0,15 do
+			self.d[i][j]=system_colour()
+			twist()
+		end
+	end
+	--draw it
+	draw_ui(nil)
+	camera(-16,-16)
+	for i=0,15 do
+		for j=0,15 do
+	rectfill(i*6,j*6,i*6+4,j*6+4,self.d[i][j])
+		end
+	end
+	camera()
+end
+
+function states.map:update()
+	if (btnp(4)) update_state()
+end
+
+function states.map:draw()
 end
 
 function system:init()
@@ -655,12 +692,50 @@ function update_state()
 	end
 end
 
+function twist()
+	local old=w0
+	w0=w1
+	w1=w2
+	w2=old+w0+w1
+	--debug('seed: ')
+end
+
+function system_colour()
+	return band(0xf,uint_shr(w0,8))
+end
+
+function uint_shr(x,n)
+	--shortcut
+	if(x>=0) return flr(shr(x,n))
+	--left shift unsupported
+	assert(n>=0)
+	if(n==0)then
+		return x
+	else
+		--print("depth: "..n)
+		local out=0
+		for i=0,14 do
+			-- lacking a bit set operation
+			local bit_to_set=shl(1,i)
+			local bit_to_test=shl(1,i+1)
+			-- lua: 0 is true
+			if(band(x,bit_to_test)!=0)then
+				--print("setting bit "..i)
+				out=bor(out,bit_to_set)
+			end
+		end
+		return uint_shr(out,flr(n-1))
+	end
+end
+
 function _init()
 	srand(666)
 	state="menu"
 	local p=create_ship('c')
 	p.fuel=10000
 	player.score=0
+	player.sysx=0
+	player.sysy=0
 	player.ship=p
 	p.player=player
 	for k,v in pairs(states) do v:init() end
