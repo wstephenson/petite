@@ -75,6 +75,7 @@ end
 
 function states.map:init()
 	cls()
+	self.blink_timer=0
 	self.next_state="system"
 	--map
 	self.d={}
@@ -88,17 +89,39 @@ function states.map:init()
 	end
 	--draw it
 	draw_ui(nil)
-	camera(-16,-16)
+	camera(-17,-16)
 	for i=0,15 do
 		for j=0,15 do
-	rectfill(i*6,j*6,i*6+4,j*6+4,self.d[i][j])
+			rectfill(i*5,j*5,i*5+3,j*5+3,self.d[i][j])
 		end
 	end
 	camera()
 end
 
+function xor_rect(x,y,x2,y2)
+	-- xor's each byte with 0xff
+	-- each screen row is 64 bytes
+	-- base addr of row given by y*0x40
+	-- addr of bytes to xor = base + x/2 to x2-x/2
+	assert(x2>x)
+	assert(y2>y)
+	local screenbase=0x6000
+	for i=0,y2-y do
+		local rowbase=screenbase+(y+i)*0x40
+		local colstart=rowbase+x/2
+		--xor each byte in rect
+		for j=0,(x2-x)/2 do
+			local pixpair=peek(colstart+j)
+			pixpair=bxor(pixpair,0xff)
+			poke(colstart+j, pixpair)
+		end
+	end
+end
+
 function states.map:update()
-	if (btnp(4)) update_state()
+	if(btnp(4)) update_state()
+	self.blink_timer+=1
+	if(self.blink_timer%10==0)xor_rect(16,15,20,20)
 end
 
 function states.map:draw()
