@@ -97,7 +97,7 @@ function states.map:init()
 	camera(-self.map_originx,-self.map_originy)
 	for i=0,galaxy_side-1 do
 		for j=0,galaxy_side-1 do
-			rectfill(i*5+1,j*5+1,i*5+4,j*5+4,self.d[i][j])
+			rectfill(j*5+1,i*5+1,j*5+4,i*5+4,self.d[i][j])
 		end
 	end
 	camera()
