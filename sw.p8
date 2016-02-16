@@ -58,7 +58,7 @@ end
 function states.docked:init()
 	self.next_state="map"
 	self.txt={"docked",
-			"system: zelada",
+			"system: ("..player.sysx..","..player.sysy..")",
 			"score:"..player.score,
 			"rank: harmless",
 			"",
