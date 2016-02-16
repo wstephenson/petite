@@ -105,34 +105,6 @@ function states.map:init()
 	camera()
 end
 
-function xor_rect(x,y,x2,y2)
-	-- xor's each byte with 0xff
-	-- each screen row is 64 bytes
-	-- base addr of row given by y*0x40
-	-- bytes to xor = base + x/2 to x2-x/2 + 1 if unalignedend
-	-- x is even: start at x/2
-	-- x is odd: start at (x/2) and xor 0xf0 first, xor 0x0f last
-	assert(x2>x)
-	assert(y2>y)
-	local screenbase=0x6000
-	local unaligned_start=x%2
-	local unaligned_end=x2%2
-	local bytes_wide=flr((x2-x)/2)+unaligned_end
-	for i=0,y2-y-1 do
-		local rowbase=screenbase+(y+i)*0x40
-		local colstart=rowbase+x/2
-		--xor each byte in row
-		for j=0,bytes_wide-1 do
-			local xor=0xff
-			if (j==0 and unaligned_start>0) xor=0xf0
-			if (j==bytes_wide-1 and unaligned_end > 0) then xor=0xf end
-			local pixpair=peek(colstart+j)
-			pixpair=bxor(pixpair,xor)
-			poke(colstart+j, pixpair)
-		end
-	end
-end
-
 function states.map:update()
 	if(btnp(0)) then self:erase_blink() player.sysx-=1 end
 	if(btnp(1)) then self:erase_blink() player.sysx+=1 end
@@ -600,6 +572,34 @@ end
 -- utility
 function clamp(val,minv,maxv)
 	return max(minv,min(val,maxv))
+end
+
+function xor_rect(x,y,x2,y2)
+	-- xor's each byte with 0xff
+	-- each screen row is 64 bytes
+	-- base addr of row given by y*0x40
+	-- bytes to xor = base + x/2 to x2-x/2 + 1 if unalignedend
+	-- x is even: start at x/2
+	-- x is odd: start at (x/2) and xor 0xf0 first, xor 0x0f last
+	assert(x2>x)
+	assert(y2>y)
+	local screenbase=0x6000
+	local unaligned_start=x%2
+	local unaligned_end=x2%2
+	local bytes_wide=flr((x2-x)/2)+unaligned_end
+	for i=0,y2-y-1 do
+		local rowbase=screenbase+(y+i)*0x40
+		local colstart=rowbase+x/2
+		--xor each byte in row
+		for j=0,bytes_wide-1 do
+			local xor=0xff
+			if (j==0 and unaligned_start>0) xor=0xf0
+			if (j==bytes_wide-1 and unaligned_end > 0) then xor=0xf end
+			local pixpair=peek(colstart+j)
+			pixpair=bxor(pixpair,xor)
+			poke(colstart+j, pixpair)
+		end
+	end
 end
 
 function draw_ui(txt)
