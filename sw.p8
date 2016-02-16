@@ -25,6 +25,7 @@ stellar_radius_crit=1.05
 shield_recharge_wait=150 -- 5 seconds
 --galaxy map
 --seeds
+galaxy_side=16
 seed0=0x5a4a
 seed1=0x0248
 seed2=0xb753
@@ -86,9 +87,9 @@ function states.map:init()
 	--map
 	self.d={}
 
-	for i=0,15 do
+	for i=0,galaxy_side-1 do
 		self.d[i]={}
-		for j=0,15 do
+		for j=0,galaxy_side-1 do
 			self.d[i][j]=system_colour()
 			twist()
 		end
@@ -96,8 +97,8 @@ function states.map:init()
 	--draw it
 	draw_ui(nil)
 	camera(-self.map_originx,-self.map_originy)
-	for i=0,15 do
-		for j=0,15 do
+	for i=0,galaxy_side-1 do
+		for j=0,galaxy_side-1 do
 			rectfill(i*5+1,j*5+1,i*5+4,j*5+4,self.d[i][j])
 		end
 	end
