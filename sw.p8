@@ -75,9 +75,7 @@ function states.docked:update()
 end
 
 function states.map:init()
-	w0=seed0
-	w1=seed1
-	w2=seed2
+	reseed_galaxy()
 	cls()
 	self.blink_timer=0
 	self.blinked_cursor=false
@@ -756,6 +754,12 @@ function twist()
 	w1=w2
 	w2=old+w0+w1
 	--debug('seed: ')
+end
+
+function reseed_galaxy()
+	w0=seed0
+	w1=seed1
+	w2=seed2
 end
 
 function system_colour()
