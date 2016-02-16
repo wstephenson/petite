@@ -134,6 +134,7 @@ end
 
 function system:init()
 	self.next_state="docked"
+	generate_system(player.sysx,player.sysy)
 	self.lastcx=64
 	self.lastcy=64
 	self.objects={}
@@ -199,7 +200,7 @@ function system:populate()
 				x=60,
 				y=-60,
 				r=20,
-				color=11
+				color=states.map.d[player.sysx][player.sysy]
 			},
 			station = {
 				x=60+40*cos(-0.375),
@@ -765,7 +766,7 @@ end
 function generate_system(x,y)
 	reseed_galaxy()
 	local system_index=y*galaxy_side+x
-	for i=0,system_index do
+	for i=1,system_index do
 		twist()
 	end
 end
