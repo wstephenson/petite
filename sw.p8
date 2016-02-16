@@ -25,9 +25,9 @@ stellar_radius_crit=1.05
 shield_recharge_wait=150 -- 5 seconds
 --galaxy map
 --seeds
-w0=0x5a4a
-w1=0x0248
-w2=0xb753
+seed0=0x5a4a
+seed1=0x0248
+seed2=0xb753
 --current game state
 state=nil
 --table of all game states
@@ -74,6 +74,9 @@ function states.docked:update()
 end
 
 function states.map:init()
+	w0=seed0
+	w1=seed1
+	w2=seed2
 	cls()
 	self.blink_timer=0
 	self.blinked_cursor=false
