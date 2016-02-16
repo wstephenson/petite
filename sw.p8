@@ -762,6 +762,14 @@ function reseed_galaxy()
 	w2=seed2
 end
 
+function generate_system(x,y)
+	reseed_galaxy()
+	local system_index=y*galaxy_side+x
+	for i=0,system_index do
+		twist()
+	end
+end
+
 function system_colour()
 	return band(0xf,uint_shr(w0,8))
 end
