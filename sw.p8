@@ -200,7 +200,7 @@ function system:populate()
 				x=60,
 				y=-60,
 				r=20,
-				color=states.map.d[player.sysx][player.sysy]
+				color=system_colour()
 			},
 			station = {
 				x=60+40*cos(-0.375),
