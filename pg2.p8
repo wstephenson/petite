@@ -1,6 +1,7 @@
 pico-8 cartridge // http://www.pico-8.com
 version 5
 __lua__
+-- vim: set ft=lua ts=1 sw=1 noet:
 w0=0x5a4a
 w1=0x0248
 w2=0xb753
