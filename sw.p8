@@ -791,8 +791,8 @@ function _init()
 	local p=create_ship('c')
 	p.fuel=10000
 	player.score=0
-	player.sysx=0
-	player.sysy=0
+	player.sysx=3
+	player.sysy=3
 	player.ship=p
 	p.player=player
 	for k,v in pairs(states) do v:init() end
