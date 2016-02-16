@@ -76,7 +76,10 @@ end
 function states.map:init()
 	cls()
 	self.blink_timer=0
+	self.blinked_cursor=false
 	self.next_state="system"
+	self.map_originx=24
+	self.map_originy=24
 	--map
 	self.d={}
 
@@ -89,10 +92,10 @@ function states.map:init()
 	end
 	--draw it
 	draw_ui(nil)
-	camera(-17,-16)
+	camera(-self.map_originx,-self.map_originy)
 	for i=0,15 do
 		for j=0,15 do
-			rectfill(i*5,j*5,i*5+3,j*5+3,self.d[i][j])
+			rectfill(i*5+1,j*5+1,i*5+4,j*5+4,self.d[i][j])
 		end
 	end
 	camera()
@@ -102,26 +105,54 @@ function xor_rect(x,y,x2,y2)
 	-- xor's each byte with 0xff
 	-- each screen row is 64 bytes
 	-- base addr of row given by y*0x40
-	-- addr of bytes to xor = base + x/2 to x2-x/2
+	-- bytes to xor = base + x/2 to x2-x/2 + 1 if unalignedend
+	-- x is even: start at x/2
+	-- x is odd: start at (x/2) and xor 0xf0 first, xor 0x0f last
 	assert(x2>x)
 	assert(y2>y)
 	local screenbase=0x6000
-	for i=0,y2-y do
+	local unaligned_start=x%2
+	local unaligned_end=x2%2
+	local bytes_wide=flr((x2-x)/2)+unaligned_end
+	for i=0,y2-y-1 do
 		local rowbase=screenbase+(y+i)*0x40
 		local colstart=rowbase+x/2
-		--xor each byte in rect
-		for j=0,(x2-x)/2 do
+		--xor each byte in row
+		for j=0,bytes_wide-1 do
+			local xor=0xff
+			if (j==0 and unaligned_start>0) xor=0xf0
+			if (j==bytes_wide-1 and unaligned_end > 0) then xor=0xf end
 			local pixpair=peek(colstart+j)
-			pixpair=bxor(pixpair,0xff)
+			pixpair=bxor(pixpair,xor)
 			poke(colstart+j, pixpair)
 		end
 	end
 end
 
 function states.map:update()
-	if(btnp(4)) update_state()
+	if(btnp(0)) then self:erase_blink() player.sysx-=1 end
+	if(btnp(1)) then self:erase_blink() player.sysx+=1 end
+	if(btnp(2)) then self:erase_blink() player.sysy-=1 end
+	if(btnp(3)) then self:erase_blink() player.sysy+=1 end
+	if(btnp(4)) then update_state() end
+
 	self.blink_timer+=1
-	if(self.blink_timer%10==0)xor_rect(16,15,20,20)
+	if(self.blink_timer%10==0) self:blink_cursor()
+end
+
+function states.map:blink_cursor()
+	self.blinked_cursor=not self.blinked_cursor
+	local cx1=self.map_originx+(player.sysx*5)
+	local cy1=self.map_originy+(player.sysy*5)
+	local cx2=cx1+6
+	local cy2=cy1+6
+	local unaligned_start=cx1%2
+	local unaligned_end=cx2%2
+	xor_rect(cx1,cy1,cx2,cy2)
+end
+
+function states.map:erase_blink()
+	if(self.blinked_cursor) self:blink_cursor()
 end
 
 function states.map:draw()
