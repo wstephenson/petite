@@ -188,7 +188,7 @@ function system:populate()
 	local stype='basic'
 	self.environment={}
 	if(stype=='basic' or stype=='roids') then
-	planet_radius=2+2.5*planet_size()
+	local planet_radius=2+2.5*planet_size()
 	self.environment = {
 			stype=stype,
 			star = {
