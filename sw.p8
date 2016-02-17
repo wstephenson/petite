@@ -796,7 +796,7 @@ end
 function planet_color()
 	-- 5 lowest bits of hsb of w0
 	local planet_colors={[0]=3,4,5,6,8,10,11,12,14,15}
-	return planet_colors[band(uint_shr(w0,8),0x1f)] or 7
+	return planet_colors[flr(band(uint_shr(w0,8),0x1f)*0.65)] or 7
 end
 
 -- placeholder 
