@@ -189,12 +189,13 @@ function system:populate()
 	self.environment={}
 	if(stype=='basic' or stype=='roids') then
 	local planet_radius=2+2.5*planet_size()
+	local dwarf_star_scalef=(star_color()==2 or star_color()==7) and 0.33 or 1
 	self.environment = {
 			stype=stype,
 			star = {
 				x=-75,
 				y=75,
-				r=50,
+				r=(20+4*star_size())*dwarf_star_scalef,
 				color=star_color()
 			},
 			planet = {
