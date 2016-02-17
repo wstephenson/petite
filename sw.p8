@@ -778,7 +778,7 @@ function star_size()
 	return band(0xf,uint_shr(w1,8))
 end
 
-function star_colour()
+function star_color()
 	-- 4 highest bits of hsb of w1
 	return uint_shr(w1,12)
 end
