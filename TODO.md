@@ -2,7 +2,7 @@ Game loop (in progress)
 
 Player object(persistent over state)
  Ship damage (in progress)
- Ship fuel
+ Ship fuel (in progress)
  Rank
  Score (done)
 Fuel scooping (done)
@@ -11,14 +11,17 @@ Stellar heating (needs balance)
  Rate dependent on distance to star (done)
  Heat according to inverse square of distance to star (done)
 UI for when docked (in progress)
+ Switch pages
+  XOR cursor (done)
+ Trading
  Ship repair
  Ship upgrade
- Select next system to jump to (galaxy map)
+ Select next system to jump to (galaxy map) (done)
 NPC AI
  Pirates that attack you
  Traders that just travel from entry point to station
 Local scanner
-Scoring (in progress0
+Scoring (in progress)
  System score
  Kill score
  Scoop score
@@ -26,15 +29,49 @@ Player alignment (like score)
  (-1 to +1 scale based on actions)
  controls ability to dock at stations
 Galaxy map
-Procedural system generation, not just random
- Vary palette according to system type
-Hyperjump to a new system
-Fuel?
-Fuel scooping?
+Procedural system generation, not just random (in progress)
+ Vary palette according to system type (sort of done)
+Hyperjump to a new system (started)
 Planet/sun/station collisions
 Weapon/health/shield/heat balancing
 Real system scenarios 
 
 Statistics screen on death
 Start screen/attract mode
+
+
+Trading engine notes
+====================
+Trading carried out automatically on docking
+Trade value depends on cargo type and station docked at
+Cargo type depends on origin system
+There is a table matching source and destination system
+So we need to define system types
+Agri/Tech/
+SRC-----DEST----VALUE
+HI	HI	$
+"	LO	$$
+"	C	$$$
+LO	HI	$$
+"	LO	$
+"	C	$$$
+CONTRA	HI	0
+"	LO	0
+"	C	0
+
+Logic: Anarchy systems produce nothing so pay out high prices for imports.  However you collect no cargo on the outward leg. This is offset by the opposition you should face there, and the bounties to be earned.
+
+# System characteristics and PG data footprint
+* Planet size 4 bits
+* Planet radius 4  - could take either of the x,y coords and split
+* Planet colour(GRND,GRNL,BRN,GRYD,GRYL,RED,YEL,BLU,PNK,SKIN
+*  or color1,color2 = 10 = 4 bits
+* Star class (BH,PUR,RED,YEL,WHT,BL) = 6 = 4 bits needed
+* Economy 3 bits)
+
+On docking in system: 
+If cargo flag set
+  Award cargo value\*ship size points 
+  Unset cargo flag
+Set cargo flag to current system type
 
