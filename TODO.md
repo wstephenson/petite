@@ -30,6 +30,8 @@ Player alignment (like score)
  controls ability to dock at stations
 Galaxy map
 Procedural system generation, not just random (in progress)
+ Planet colour (done)
+ Planet size (done)
  Vary palette according to system type (sort of done)
 Hyperjump to a new system (started)
 Planet/sun/station collisions
@@ -62,11 +64,11 @@ CONTRA	HI	0
 Logic: Anarchy systems produce nothing so pay out high prices for imports.  However you collect no cargo on the outward leg. This is offset by the opposition you should face there, and the bounties to be earned.
 
 # System characteristics and PG data footprint
-* Planet size 4 bits
+* Star size 4 bits
+* Star class (BH,PUR,RED,YEL,WHT,BL) = 6 = 4 bits needed
 * Planet radius 4  - could take either of the x,y coords and split
 * Planet colour(GRND,GRNL,BRN,GRYD,GRYL,RED,YEL,BLU,PNK,SKIN
 *  or color1,color2 = 10 = 4 bits
-* Star class (BH,PUR,RED,YEL,WHT,BL) = 6 = 4 bits needed
 * Economy 3 bits)
 
 On docking in system: 
