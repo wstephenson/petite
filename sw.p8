@@ -88,7 +88,7 @@ function states.map:init()
 	for i=0,galaxy_side-1 do
 		self.d[i]={}
 		for j=0,galaxy_side-1 do
-			self.d[i][j]=system_colour()
+			self.d[i][j]=system_color()
 			twist()
 		end
 	end
@@ -200,7 +200,7 @@ function system:populate()
 				x=60,
 				y=-60,
 				r=20,
-				color=system_colour()
+				color=planet_color()
 			},
 			station = {
 				x=60+40*cos(-0.375),
@@ -771,7 +771,34 @@ function generate_system(x,y)
 	end
 end
 
-function system_colour()
+function star_size()
+	-- 4 lowest bits of hsb of w1
+	return band(0xf,uint_shr(w1,8))
+end
+
+function star_colour()
+	-- 4 highest bits of hsb of w1
+	return uint_shr(w1,12)
+end
+
+function system_economy()
+	-- 3 lowest bits of hsb of w0
+	return band(uint_shr(w0,8),0x7)
+end
+
+function planet_size()
+	-- 3 lowest bits of hsb of w1
+ return uint_shr(band(w2,0xf00),8)
+end
+
+function planet_color()
+	-- 5 lowest bits of hsb of w0
+	local planet_colors={[0]=3,4,5,6,8,10,11,12,14,15}
+	return planet_colors[band(uint_shr(w0,8),0x1f)] or 7
+end
+
+-- placeholder 
+function system_color()
 	return band(0xf,uint_shr(w0,8))
 end
 
