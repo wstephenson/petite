@@ -185,10 +185,11 @@ function system:update()
 end
 
 function system:populate()
-	local stype='roids'
+	local stype='basic'
 	self.environment={}
 	if(stype=='basic' or stype=='roids') then
-		self.environment = {
+	planet_radius=2+2.5*planet_size()
+	self.environment = {
 			stype=stype,
 			sun = {
 				x=-75,
@@ -199,12 +200,12 @@ function system:populate()
 			planet = {
 				x=60,
 				y=-60,
-				r=20,
+				r=planet_radius,
 				color=planet_color()
 			},
 			station = {
-				x=60+40*cos(-0.375),
-				y=-60+40*sin(-0.375),
+				x=60+(planet_radius+20)*cos(-0.375),
+				y=-60+(planet_radius+20)*sin(-0.375),
 				angle=0.25,
 				color=9,
 				verts={
@@ -387,7 +388,8 @@ function system:draw()
 		line(p.x,p.y,p.x-p.xv,p.y-p.yv,p.ttl > 12 and 10 or (p.ttl > 7 and 9 or 8))
 	end
 	camera()
-	print("<"..pship.actions[pship.curr_action]..'>',10)
+	print('ps:'..planet_size()..',pc:'..planet_color(),10)
+	--print("<"..pship.actions[pship.curr_action]..'>',10)
 	self:debug()
 end
 
