@@ -88,7 +88,7 @@ function states.map:init()
 	for i=0,galaxy_side-1 do
 		self.d[i]={}
 		for j=0,galaxy_side-1 do
-			self.d[i][j]=system_color()
+			self.d[i][j]=star_color()
 			twist()
 		end
 	end
@@ -195,7 +195,7 @@ function system:populate()
 				x=-75,
 				y=75,
 				r=50,
-				color=10
+				color=star_color()
 			},
 			planet = {
 				x=60,
@@ -388,7 +388,8 @@ function system:draw()
 		line(p.x,p.y,p.x-p.xv,p.y-p.yv,p.ttl > 12 and 10 or (p.ttl > 7 and 9 or 8))
 	end
 	camera()
-	print('ps:'..planet_size()..',pc:'..planet_color(),10)
+	local sc=uint_shr(w1,12)*0.47
+	print('ps:'..planet_size()..',pc:'..planet_color()..',sc:'..sc,10)
 	--print("<"..pship.actions[pship.curr_action]..'>',10)
 	self:debug()
 end
@@ -780,7 +781,8 @@ end
 
 function star_color()
 	-- 4 highest bits of hsb of w1
-	return uint_shr(w1,12)
+	local star_colors={[0]=1,2,8,9,10,7,12}
+	return star_colors[flr(uint_shr(w1,12)*0.47)] or 8
 end
 
 function system_economy()
