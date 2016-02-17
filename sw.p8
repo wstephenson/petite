@@ -15,7 +15,7 @@ map_size=128
 speed_torp=5
 heat_laser=30
 heat_torp=60
-heat_sun=10
+heat_star=10
 dmg_laser=20
 dmg_torp=60
 stellar_radius_scoop_max=1.35
@@ -191,7 +191,7 @@ function system:populate()
 	planet_radius=2+2.5*planet_size()
 	self.environment = {
 			stype=stype,
-			sun = {
+			star = {
 				x=-75,
 				y=75,
 				r=50,
@@ -239,7 +239,7 @@ function system:populate()
 			end
 		end)
 	end
-	local entry_body = self.environment.sun
+	local entry_body = self.environment.star
 	local entry_angle=0.125
 	player.ship.x=entry_body.x+entry_body.r*1.5*cos(entry_angle)
 	player.ship.y=entry_body.y+entry_body.r*1.5*sin(entry_angle)
@@ -248,7 +248,7 @@ end
 
 function system:environment_update()
 	local station=self.environment.station
-	local sun=self.environment.sun
+	local star=self.environment.star
 	station.angle-=0.005
 	-- check for docking
 	if(distance(vec(player.ship.x,player.ship.y),vec(station.x,station.y))<20 and
@@ -257,28 +257,28 @@ function system:environment_update()
  end
 	-- if player is within scooping range, scoop fuel dependent on velocity
 	local pship=player.ship
-	player.scooping=(distance(vec(pship.x,pship.y),vec(sun.x,sun.y))<sun.r*stellar_radius_scoop_max)
+	player.scooping=(distance(vec(pship.x,pship.y),vec(star.x,star.y))<star.r*stellar_radius_scoop_max)
 	if(player.scooping)then
 		local speed = mysqrt(pship.xv*pship.xv+pship.yv*pship.yv)
 		local fuel=scoop_max*speed/pship.maxv
 		pship.fuel=min(pship.fuel+fuel,10000)
 	end
 	-- ship heating
-	local dist_player2star=distance(vec(pship.x,pship.y),vec(sun.x,sun.y))
-	local dist_safe=sun.r*stellar_radius_safe
-	local dist_crit=sun.r*stellar_radius_crit
+	local dist_player2star=distance(vec(pship.x,pship.y),vec(star.x,star.y))
+	local dist_safe=star.r*stellar_radius_safe
+	local dist_crit=star.r*stellar_radius_crit
 	local heat_strength=1-clamp((dist_player2star-dist_crit)/(dist_safe-dist_crit),0,1)
-	pship.heat+=heat_sun*heat_strength
+	pship.heat+=heat_star*heat_strength
 end
 
 function system:environment_draw()
 	local env=self.environment
-	local sun=env.sun
+	local star=env.star
 	local station=env.station
 	local planet=env.planet
 
 	rect(-map_size,-map_size,map_size,map_size,14)
-	circ(sun.x,sun.y,sun.r+rnd(1)-0.5,sun.color)
+	circ(star.x,star.y,star.r+rnd(1)-0.5,star.color)
 	circ(planet.x,planet.y,planet.r,planet.color)
 	local poly=fmap(station.verts,function(i) return rotate_point(station.x+i.x,station.y+i.y,station.angle,station.x,station.y) end)
 	draw_poly(poly,station.color)
