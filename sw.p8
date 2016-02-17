@@ -258,7 +258,8 @@ function system:environment_update()
  end
 	-- if player is within scooping range, scoop fuel dependent on velocity
 	local pship=player.ship
-	player.scooping=(distance(vec(pship.x,pship.y),vec(star.x,star.y))<star.r*stellar_radius_scoop_max)
+	local not_scoopable=star.color==1 or star.color==2 or star.color==7
+	player.scooping=(distance(vec(pship.x,pship.y),vec(star.x,star.y))<star.r*stellar_radius_scoop_max) and not not_scoopable
 	if(player.scooping)then
 		local speed = mysqrt(pship.xv*pship.xv+pship.yv*pship.yv)
 		local fuel=scoop_max*speed/pship.maxv
