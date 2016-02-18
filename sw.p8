@@ -60,9 +60,11 @@ function states.docked:init()
 	self.next_state="map"
 	generate_system(player.sysx,player.sysy)
 	self.txt={"docked",
+			"",
 			"score:"..player.score,
 			"rank: harmless",
 			"system:"..system_economy_label().." ("..player.sysx..","..player.sysy..")",
+			"cargo:"..cargo_label(),
 			"",
 			"press z to launch"}
 end
@@ -255,6 +257,7 @@ function system:environment_update()
 	-- check for docking
 	if(distance(vec(player.ship.x,player.ship.y),vec(station.x,station.y))<20 and
 			abs(station.angle%1-player.ship.angle%1)<=0.05) then
+		do_trade()
 		update_state()
  end
 	-- if player is within scooping range, scoop fuel dependent on velocity
@@ -797,6 +800,7 @@ function system_economy_label()
 	local label={[0]="none","none","none","lo-tech","lo-tech","hi-tech","hi-tech","anarchy"}
 	return label[system_economy()]
 end
+
 function planet_size()
 	-- 3 lowest bits of hsb of w1
  return uint_shr(band(w2,0xf00),8)
@@ -811,6 +815,76 @@ end
 -- placeholder 
 function system_color()
 	return band(0xf,uint_shr(w0,8))
+end
+
+-- trading
+function cargo_label()
+	local cargo_types={[0]="none","lo-tech","hi-tech","contraband","stolen"}
+	return cargo_types[player.cargo] or "miss!"
+end
+
+function do_trade()
+	-- ship size factor, placeholder
+	local ssf=1
+	local cargo_value=0
+	local new_cargo=player.cargo
+	--local system_economy=system_econy
+	if(player.cargo==0)then --EMPTY
+		if(system_economy()==3 or system_economy()==4)then --LT
+			new_cargo=1
+		end
+		if(system_economy()==5 or system_economy()==6)then --HT
+			new_cargo=2
+		end
+		if(system_economy()==7)then --AN
+			new_cargo=0
+		end
+	end
+	if(player.cargo==1)then --LT
+		if(system_economy()==3 or system_economy()==4)then --LT
+			new_cargo=1
+			cargo_value=100
+		end
+		if(system_economy()==5 or system_economy()==6)then --HT
+			new_cargo=2
+			cargo_value=200
+		end
+		if(system_economy()==7)then --AN
+			new_cargo=0
+			cargo_value=400
+		end
+	end
+	if(player.cargo==2)then --HT
+		if(system_economy()==3 or system_economy()==4)then --LT
+			new_cargo=1
+			cargo_value=200
+		end
+		if(system_economy()==5 or system_economy()==6)then --HT
+			new_cargo=2
+			cargo_value=100
+		end
+		if(system_economy()==7)then --AN
+			new_cargo=0
+			cargo_value=400
+		end
+	end
+	--todo: give contraband value when there are cops
+	if(player.cargo==3)then --CON
+		if(system_economy()==3 or system_economy()==4)then --LT
+			new_cargo=1
+			cargo_value=0
+		end
+		if(system_economy()==5 or system_economy()==6)then --HT
+			new_cargo=2
+			cargo_value=0
+		end
+		if(system_economy()==7)then --AN
+			new_cargo=0
+			cargo_value=0
+		end
+	end
+	player.cargo=new_cargo
+	player.score+=cargo_value*ssf
 end
 
 function uint_shr(x,n)
@@ -846,6 +920,7 @@ function _init()
 	player.sysx=3
 	player.sysy=3
 	player.ship=p
+	player.cargo=0
 	p.player=player
 	for k,v in pairs(states) do v:init() end
 end
