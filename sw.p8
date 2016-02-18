@@ -58,10 +58,11 @@ end
 
 function states.docked:init()
 	self.next_state="map"
+	generate_system(player.sysx,player.sysy)
 	self.txt={"docked",
-			"system: ("..player.sysx..","..player.sysy..")",
 			"score:"..player.score,
 			"rank: harmless",
+			"system:"..system_economy_label().." ("..player.sysx..","..player.sysy..")",
 			"",
 			"press z to launch"}
 end
@@ -792,6 +793,10 @@ function system_economy()
 	return band(uint_shr(w0,8),0x7)
 end
 
+function system_economy_label()
+	local label={[0]="none","none","none","lo-tech","lo-tech","hi-tech","hi-tech","anarchy"}
+	return label[system_economy()]
+end
 function planet_size()
 	-- 3 lowest bits of hsb of w1
  return uint_shr(band(w2,0xf00),8)
