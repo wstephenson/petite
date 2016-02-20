@@ -82,21 +82,24 @@ function states.map:init()
 	self.next_state="system"
 	self.map_originx=24
 	self.map_originy=24
-	--map
-	self.d={}
 
-	for i=0,galaxy_side-1 do
-		self.d[i]={}
-		for j=0,galaxy_side-1 do
-			local system={}
-			system.color=star_color()
-			local dwarf_star_scalef=(star_color()==2 or star_color()==7) and 0.33 or 1
-			r=(20+4*star_size())*dwarf_star_scalef
-			local distance_from_start=distance(vec(3,3),vec(j,i))
-			system.known=r/(distance_from_start*distance_from_start)
-			self.d[i][j]=system
-			twist()
+	--map
+	if(not self.map_generated)then
+		self.d={}
+		for i=0,galaxy_side-1 do
+			self.d[i]={}
+			for j=0,galaxy_side-1 do
+				local system={}
+				system.color=star_color()
+				local dwarf_star_scalef=(star_color()==2 or star_color()==7) and 0.33 or 1
+				local r=(20+4*star_size())*dwarf_star_scalef
+				local distance_from_start=distance(vec(3,3),vec(j,i))
+				system.known=r/(distance_from_start*distance_from_start)
+				self.d[i][j]=system
+				twist()
+			end
 		end
+		self.map_generated=true
 	end
 	--draw it
 	draw_ui(nil)
