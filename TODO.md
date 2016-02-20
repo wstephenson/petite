@@ -16,7 +16,9 @@ UI for when docked (in progress)
  Trading
  Ship repair
  Ship upgrade
+Galaxy map
  Select next system to jump to (galaxy map) (done)
+ Show econ type on map
 NPC AI
  Pirates that attack you
  Traders that just travel from entry point to station
@@ -37,6 +39,13 @@ Hyperjump to a new system (started)
 Planet/sun/station collisions
 Weapon/health/shield/heat balancing
 Real system scenarios 
+Trading
+Scoring
+ UI for showing score items
+ Array of score items that are assessed on state change
+ Feedback on trading profits
+Contraband cargo
+Sort out system coordinate confusion
 
 Statistics screen on death
 Start screen/attract mode
