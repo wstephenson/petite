@@ -94,7 +94,7 @@ function states.map:init()
 				local dwarf_star_scalef=(star_color()==2 or star_color()==7) and 0.33 or 1
 				local r=(20+4*star_size())*dwarf_star_scalef
 				local distance_from_start=distance(vec(3,3),vec(j,i))
-				system.known=r/(distance_from_start*distance_from_start)
+				system.known=r/(distance_from_start*distance_from_start)>1.4
 				self.d[i][j]=system
 				twist()
 			end
@@ -106,7 +106,7 @@ function states.map:init()
 	camera(-self.map_originx,-self.map_originy)
 	for i=0,galaxy_side-1 do
 		for j=0,galaxy_side-1 do
-			if(self.d[i][j].known>0.5)then
+			if(self.d[i][j].known)then
 				rectfill(j*5+1,i*5+1,j*5+4,i*5+4,self.d[i][j].color)
 			else
 				rect(j*5+1,i*5+1,j*5+4,i*5+4,self.d[i][j].color)
@@ -124,8 +124,7 @@ function states.map:update()
 	if(btnp(4)) then update_state() end
 
 	rectfill(8,114,120,120,0)
-	local known=self.d[player.sysx][player.sysy].known
-	print(known,9,115,10)
+	print(self.d[player.sysx][player.sysy].known,9,115,10)
 
 	self.blink_timer+=1
 	if(self.blink_timer%10==0) self:blink_cursor()
@@ -271,6 +270,7 @@ function system:environment_update()
 	-- check for docking
 	if(distance(vec(player.ship.x,player.ship.y),vec(station.x,station.y))<20 and
 			abs(station.angle%1-player.ship.angle%1)<=0.05) then
+		states.map:do_exploration_award()
 		update_state()
  end
 	-- if player is within scooping range, scoop fuel dependent on velocity
@@ -588,6 +588,14 @@ function system:killed(subject, object)
 	if(subject and subject.origin==player.ship)player.score+=1
 	del(self.objects,object)
 	make_explosion(vec(object.x,object.y,object.xv,object.yv))
+end
+
+function states.map:do_exploration_award()
+	if(not states.map.d[player.sysy][player.sysx].known)then
+		--todo: add score item
+		player.score+=2000
+		states.map.d[player.sysy][player.sysx].known=true
+	end
 end
 
 -- utility
