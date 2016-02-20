@@ -88,7 +88,13 @@ function states.map:init()
 	for i=0,galaxy_side-1 do
 		self.d[i]={}
 		for j=0,galaxy_side-1 do
-			self.d[i][j]=star_color()
+			local system={}
+			system.color=star_color()
+			local dwarf_star_scalef=(star_color()==2 or star_color()==7) and 0.33 or 1
+			r=(20+4*star_size())*dwarf_star_scalef
+			local distance_from_start=distance(vec(3,3),vec(j,i))
+			system.known=r/(distance_from_start*distance_from_start)
+			self.d[i][j]=system
 			twist()
 		end
 	end
@@ -97,7 +103,11 @@ function states.map:init()
 	camera(-self.map_originx,-self.map_originy)
 	for i=0,galaxy_side-1 do
 		for j=0,galaxy_side-1 do
-			rectfill(j*5+1,i*5+1,j*5+4,i*5+4,self.d[i][j])
+			if(self.d[i][j].known>0.5)then
+				rectfill(j*5+1,i*5+1,j*5+4,i*5+4,self.d[i][j].color)
+			else
+				rect(j*5+1,i*5+1,j*5+4,i*5+4,self.d[i][j].color)
+			end
 		end
 	end
 	camera()
@@ -109,6 +119,10 @@ function states.map:update()
 	if(btnp(2)) then self:erase_blink() player.sysy-=1 end
 	if(btnp(3)) then self:erase_blink() player.sysy+=1 end
 	if(btnp(4)) then update_state() end
+
+	rectfill(8,114,120,120,0)
+	local known=self.d[player.sysx][player.sysy].known
+	print(known,9,115,10)
 
 	self.blink_timer+=1
 	if(self.blink_timer%10==0) self:blink_cursor()
