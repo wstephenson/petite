@@ -5,41 +5,53 @@ __lua__
 --score item structure:
 -- 1:text
 -- 2:value
--- 3:ttl
-score_items={[0]={"kill",100,50},{"deal",200,50},{"explore",400,50}}
-visible_items={ {'first',50,100}}
-invisible_itmes={ {'second',50,150}, {'third',50,150} }
---visible_items={"a","b","c"}
+-- 3:color
+score=0
+total=0
+score_items={{"kill 1",100,8},{"kill 2",100,8},{"kill 3",100,8},{"kill 4",100,8},{"kill 5",100,8},{"kill 6",100,8},{"deal 7",200,10},{"deal 8",200,10},{"deal 9",200,10},{"deal 10",200,10},{"explore 11",400,12},{"explore 12",400,12},{"explore 13",400,12}}
 
 function _init()
-	if(#score_items>0)then
-		add(score_items[0], visible_items)
-		del(score_items[0], score_items)
-	end
+	display_size=9
+	scored=0
+	timer=0
 end
 
 function _draw()
 	cls()
-	print("score demo "..#visible_items, 10,10, 15)
+	print("score demo: "..#score_items.." items", 10, 10, 7)
 	local count=0
-	for j in all(visible_items)do
-  print(j[1]..' '..j[2]..' '..j[3],10,16+count*6,10+count)
+	-- display last $display_size of the $visible items of $score_items
+	local first=max(1,scored-display_size+1)
+	local count_to_show=min(display_size,scored)
+	local limit=first+count_to_show
+	local j=first
+	while j<limit do
+		item=score_items[j]
+		string=item[1]..' '..item[2]
+		print(string,10,26+(j-first)*6,item[3])
 		count+=1
+		j+=1
 	end
-	for i in all(visible_items)do
-		yoff=max(0,(50-i[3])/5)
-		print(i[1]..' : '..i[2], 20, 64-yoff, i[3]>30 and 10 or i[3]>15 and 9 or i[3]>5 and 8 or 5)
-	end
+	print(score,10,26+6*display_size+2,7)
+	print('d:'..display_size..',c2s:'..count_to_show..',f:'..first..',l:'..limit,10,26+6*(display_size+1)+2,7)
+	print('total:'..total,10,26+6*(display_size+2)+2,7)
 end
 
 function _update()
-	for i in all(visible_items)do
-		--if(i[3]<50 and #score_items>0)then
-		--	add(score_items[0], visible_items)
-		--	del(score_items[0], score_items)
-		--end
-		if(i[3]<=0)then del(visible_items,i) end
-		i[3]-=4
+	if(scored<#score_items)then
+	 timer+=1
+		if (timer%20==0)then
+			scored+=1
+			score+=score_items[scored][2]
+		end
+	else
+		if(total==0) then
+			-- unit test
+			for i in all(score_items) do
+				total+=i[2]
+			end
+			assert(total==score)
+		end
 	end
 end
 __gfx__
