@@ -632,8 +632,7 @@ end
 
 function states.map:do_exploration_award()
 	if(not states.map.d[player.sysy][player.sysx].known)then
-		--todo: add score item
-		player.score+=2000
+		add(player.score_items,{'discovery ('..player.sysx..','..player.sysy..')',2000,12})
 		states.map.d[player.sysy][player.sysx].known=true
 	end
 end
