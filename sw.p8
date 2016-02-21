@@ -878,7 +878,7 @@ function _init()
 	local p=create_ship('c')
 	p.fuel=10000
 	player.score=0
- player.score_items={{"kill 1",100,8},{"kill 2",100,8},{"kill 3",100,8},{"kill 4",100,8},{"kill 5",100,8},{"kill 6",100,8},{"deal 7",200,10},{"deal 8",200,10},{"deal 9",200,10},{"deal 10",200,10},{"explore 11",400,12},{"explore 12",400,12},{"explore 13",400,12}}
+ player.score_items={}
 	player.sysx=3
 	player.sysy=3
 	player.ship=p
