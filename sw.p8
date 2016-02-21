@@ -92,7 +92,10 @@ function states.score:update()
 			player.score+=player.score_items[self.scored][2]
 		end
 	else
-		if (btnp(4))then update_state()end
+		if (btnp(4))then
+			player.score_items={}
+			update_state()
+		end
 	end
 end
 
