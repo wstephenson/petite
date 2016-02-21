@@ -67,7 +67,7 @@ end
 function states.score:draw()
 	cls()
 	draw_ui(nil)
-	print("score: "..#player.score_items.." items", 10, 10, 7)
+	print("earnings:",46,10,7)
 	local count=0
 	-- display last $display_size of the $visible items of $score_items
 	local first=max(1,self.scored-self.display_size+1)
@@ -76,12 +76,12 @@ function states.score:draw()
 	local j=first
 	while j<limit do
 		item=player.score_items[j]
-		string=item[1]..' '..item[2]
+		string=item[1]..' '..item[2]..'cR'
 		print(string,10,26+(j-first)*6,item[3])
 		count+=1
 		j+=1
 	end
-	print(player.score,10,26+6*self.display_size+2,7)
+	print(player.score.." cR",70,26+6*self.display_size+2,7)
 end
 
 function states.score:update()
