@@ -36,6 +36,7 @@ states={}
 --default states
 states.menu={}
 states.system=system
+states.score={}
 states.docked={}
 states.map={}
 
@@ -54,6 +55,45 @@ end
 
 function states.menu:update()
 	if (btnp(4)) update_state()
+end
+
+function states.score:init()
+	self.next_state="docked"
+	self.display_size=9
+	self.scored=0
+	self.timer=0
+end
+
+function states.score:draw()
+	cls()
+	draw_ui(nil)
+	print("score: "..#player.score_items.." items", 10, 10, 7)
+	local count=0
+	-- display last $display_size of the $visible items of $score_items
+	local first=max(1,self.scored-self.display_size+1)
+	local count_to_show=min(self.display_size,self.scored)
+	local limit=first+count_to_show
+	local j=first
+	while j<limit do
+		item=player.score_items[j]
+		string=item[1]..' '..item[2]
+		print(string,10,26+(j-first)*6,item[3])
+		count+=1
+		j+=1
+	end
+	print(player.score,10,26+6*self.display_size+2,7)
+end
+
+function states.score:update()
+	if(self.scored<#player.score_items)then
+	 self.timer+=1
+		if(self.timer%20==0 or (btnp(4)))then
+			self.scored+=1
+			player.score+=player.score_items[self.scored][2]
+		end
+	else
+		if (btnp(4))then update_state()end
+	end
 end
 
 function states.docked:init()
@@ -133,7 +173,7 @@ function states.map:draw()
 end
 
 function system:init()
-	self.next_state="docked"
+	self.next_state="score"
 	generate_system(player.sysx,player.sysy)
 	self.lastcx=64
 	self.lastcy=64
@@ -838,6 +878,7 @@ function _init()
 	local p=create_ship('c')
 	p.fuel=10000
 	player.score=0
+ player.score_items={{"kill 1",100,8},{"kill 2",100,8},{"kill 3",100,8},{"kill 4",100,8},{"kill 5",100,8},{"kill 6",100,8},{"deal 7",200,10},{"deal 8",200,10},{"deal 9",200,10},{"deal 10",200,10},{"explore 11",400,12},{"explore 12",400,12},{"explore 13",400,12}}
 	player.sysx=3
 	player.sysy=3
 	player.ship=p
