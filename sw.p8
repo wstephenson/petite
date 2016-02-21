@@ -868,6 +868,8 @@ function do_trade()
 	local ssf=1
 	local cargo_value=0
 	local new_cargo=player.cargo
+	local src='uns'
+	local dest='uns'
 	--local system_economy=system_econy
 	if(player.cargo==0)then --EMPTY
 		if(system_economy()==3 or system_economy()==4)then --LT
@@ -881,29 +883,37 @@ function do_trade()
 		end
 	end
 	if(player.cargo==1)then --LT
+		src='lt'
 		if(system_economy()==3 or system_economy()==4)then --LT
+			dest='lt'
 			new_cargo=1
 			cargo_value=100
 		end
 		if(system_economy()==5 or system_economy()==6)then --HT
+			dest='ht'
 			new_cargo=2
 			cargo_value=200
 		end
 		if(system_economy()==7)then --AN
+			dest='an'
 			new_cargo=0
 			cargo_value=400
 		end
 	end
 	if(player.cargo==2)then --HT
+		src='ht'
 		if(system_economy()==3 or system_economy()==4)then --LT
+			dest='lt'
 			new_cargo=1
 			cargo_value=200
 		end
 		if(system_economy()==5 or system_economy()==6)then --HT
+			dest='ht'
 			new_cargo=2
 			cargo_value=100
 		end
 		if(system_economy()==7)then --AN
+			dest='an'
 			new_cargo=0
 			cargo_value=400
 		end
@@ -924,7 +934,9 @@ function do_trade()
 		end
 	end
 	player.cargo=new_cargo
-	player.score+=cargo_value*ssf
+	if(cargo_value>0)then
+		add(player.score_items,{"trade "..src.."->"..dest,cargo_value*ssf,8})
+	end
 end
 
 function uint_shr(x,n)
