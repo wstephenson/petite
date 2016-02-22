@@ -163,8 +163,12 @@ function states.map:update()
 	self.blink_timer+=1
 	if(self.blink_timer%10==0) self:blink_cursor()
 	rectfill(8,98,120,120,0)
-	print("cur: ("..player.sysx..","..player.sysy..")",10,98,12)
-	print("tgt: ("..self.tgtx..","..self.tgty..")",10,105,12)
+	--todo: cache this - this is update()
+	generate_system(player.sysx,player.sysy)
+	print("cur: ("..player.sysx..","..player.sysy..") - "..system_economy_label(),10,98,12)
+	generate_system(self.tgtx,self.tgty)
+	print("tgt: ("..self.tgtx..","..self.tgty..") - "..system_economy_label(),10,105,12)
+	print("cargo: "..cargo_label(),10,112,12)
 end
 
 function states.map:blink_cursor()
