@@ -128,6 +128,8 @@ function states.map:init()
 	self.next_state="system"
 	self.map_originx=24
 	self.map_originy=24
+	self.tgtx=player.sysx
+	self.tgty=player.sysy
 	--map
 	self.d={}
 
@@ -150,11 +152,11 @@ function states.map:init()
 end
 
 function states.map:update()
-	if(btnp(0)) then self:erase_blink() player.sysx-=1 end
-	if(btnp(1)) then self:erase_blink() player.sysx+=1 end
-	if(btnp(2)) then self:erase_blink() player.sysy-=1 end
-	if(btnp(3)) then self:erase_blink() player.sysy+=1 end
-	if(btnp(4)) then update_state() end
+	if(btnp(0)) then self:erase_blink() self.tgtx-=1 end
+	if(btnp(1)) then self:erase_blink() self.tgtx+=1 end
+	if(btnp(2)) then self:erase_blink() self.tgty-=1 end
+	if(btnp(3)) then self:erase_blink() self.tgty+=1 end
+	if(btnp(4)) then player.sysx=self.tgtx player.sysy=self.tgty update_state() end
 
 	self.blink_timer+=1
 	if(self.blink_timer%10==0) self:blink_cursor()
@@ -162,8 +164,8 @@ end
 
 function states.map:blink_cursor()
 	self.blinked_cursor=not self.blinked_cursor
-	local cx1=self.map_originx+(player.sysx*5)
-	local cy1=self.map_originy+(player.sysy*5)
+	local cx1=self.map_originx+(self.tgtx*5)
+	local cy1=self.map_originy+(self.tgty*5)
 	local cx2=cx1+6
 	local cy2=cy1+6
 	local unaligned_start=cx1%2
