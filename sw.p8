@@ -127,7 +127,7 @@ function states.map:init()
 	self.blinked_cursor=false
 	self.next_state="system"
 	self.map_originx=24
-	self.map_originy=24
+	self.map_originy=16
 	self.tgtx=player.sysx
 	self.tgty=player.sysy
 	--map
@@ -142,6 +142,7 @@ function states.map:init()
 	end
 	--draw it
 	draw_ui(nil)
+	print("galaxy map",44,8,12)
 	camera(-self.map_originx,-self.map_originy)
 	for i=0,galaxy_side-1 do
 		for j=0,galaxy_side-1 do
@@ -160,6 +161,9 @@ function states.map:update()
 
 	self.blink_timer+=1
 	if(self.blink_timer%10==0) self:blink_cursor()
+	rectfill(8,98,120,120,0)
+	print("cur: ("..player.sysx..","..player.sysy..")",10,98,12)
+	print("tgt: ("..self.tgtx..","..self.tgty..")",10,105,12)
 end
 
 function states.map:blink_cursor()
@@ -396,7 +400,7 @@ end
 -- system
 function system:debug()
 	local ox=0
-	print("score:"..player.score,0,94,7)
+	print("score:"..player.score..' x:'..player.sysx..' y:'..player.sysy,0,94,7)
 	if(player.scooping)then
 		print("scooping",44,64,2)
 	end
