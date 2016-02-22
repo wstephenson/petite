@@ -144,6 +144,7 @@ function states.map:init()
 	draw_ui(nil)
 	print("galaxy map",44,8,12)
 	camera(-self.map_originx,-self.map_originy)
+	rect(player.sysx*5,player.sysy*5,player.sysx*5+5,player.sysy*5+5,12)
 	for i=0,galaxy_side-1 do
 		for j=0,galaxy_side-1 do
 			rectfill(j*5+1,i*5+1,j*5+4,i*5+4,self.d[i][j])
