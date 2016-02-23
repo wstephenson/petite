@@ -18,6 +18,8 @@ heat_torp=60
 heat_star=10
 dmg_laser=20
 dmg_torp=60
+fuel_max=10000
+jump_cost=2500
 stellar_radius_scoop_max=1.35
 scoop_max=30
 stellar_radius_safe=1.4
@@ -171,7 +173,14 @@ function states.map:update()
 	if(btnp(1)) then self:erase_blink() self.tgtx+=1 end
 	if(btnp(2)) then self:erase_blink() self.tgty-=1 end
 	if(btnp(3)) then self:erase_blink() self.tgty+=1 end
-	if(btnp(4)) then player.sysx=self.tgtx player.sysy=self.tgty update_state() end
+	if(btnp(4))then -- jump to new system
+	 if(not(player.sysx==self.tgtx and player.sysy==self.tgty))then
+			player.sysx=self.tgtx
+			player.sysy=self.tgty
+			player.ship.fuel=max(0,player.ship.fuel-jump_cost)
+		end
+		update_state()
+	end
 
 	self.blink_timer+=1
 	if(self.blink_timer%10==0) self:blink_cursor()
@@ -341,7 +350,7 @@ function system:environment_update()
 	if(player.scooping)then
 		local speed = mysqrt(pship.xv*pship.xv+pship.yv*pship.yv)
 		local fuel=scoop_max*speed/pship.maxv
-		pship.fuel=min(pship.fuel+fuel,10000)
+		pship.fuel=min(pship.fuel+fuel,fuel_max)
 	end
 	-- ship heating
 	local dist_player2star=distance(vec(pship.x,pship.y),vec(star.x,star.y))
@@ -436,7 +445,7 @@ function system:debug()
 		hbar(ox,118,16,5,o.heat,o.maxheat,8,'h:')
 		ox+=30
 	end
-	hbar(0,123,123,1,player.ship.fuel,10000,8,'')
+	hbar(0,123,123,1,player.ship.fuel,fuel_max,8,'')
 end
 
 function system:draw()
@@ -1008,7 +1017,7 @@ function _init()
 	srand(666)
 	state="menu"
 	local p=create_ship('c')
-	p.fuel=10000
+	p.fuel=fuel_max
 	player.score=0
  player.score_items={}
 	player.sysx=3
