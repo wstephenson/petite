@@ -167,7 +167,7 @@ function states.map:update()
 	if(btnp(4)) then update_state() end
 
 	rectfill(8,114,120,120,0)
-	print(self.d[player.sysx][player.sysy].known,9,115,10)
+	print(self.d[player.sysy][player.sysx].known,9,115,10)
 
 	self.blink_timer+=1
 	if(self.blink_timer%10==0) self:blink_cursor()
