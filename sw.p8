@@ -101,10 +101,13 @@ end
 
 function states.docked:init()
 	self.next_state="map"
+	generate_system(player.sysx,player.sysy)
 	self.txt={"docked",
-			"system: ("..player.sysx..","..player.sysy..")",
+			"",
 			"score:"..player.score,
 			"rank: harmless",
+			"system:"..system_economy_label().." ("..player.sysx..","..player.sysy..")",
+			"cargo:"..cargo_label(),
 			"",
 			"press z to launch"}
 end
@@ -124,8 +127,9 @@ function states.map:init()
 	self.blinked_cursor=false
 	self.next_state="system"
 	self.map_originx=24
-	self.map_originy=24
-
+	self.map_originy=16
+	self.tgtx=player.sysx
+	self.tgty=player.sysy
 	--map
 	if(not self.map_generated)then
 		self.d={}
@@ -146,9 +150,12 @@ function states.map:init()
 	end
 	--draw it
 	draw_ui(nil)
+	print("galaxy map",44,8,12)
 	camera(-self.map_originx,-self.map_originy)
+	rect(player.sysx*5,player.sysy*5,player.sysx*5+5,player.sysy*5+5,12)
 	for i=0,galaxy_side-1 do
 		for j=0,galaxy_side-1 do
+			assert(#self.d>0)
 			if(self.d[i][j].known)then
 				rectfill(j*5+1,i*5+1,j*5+4,i*5+4,self.d[i][j].color)
 			else
@@ -160,23 +167,33 @@ function states.map:init()
 end
 
 function states.map:update()
-	if(btnp(0)) then self:erase_blink() player.sysx-=1 end
-	if(btnp(1)) then self:erase_blink() player.sysx+=1 end
-	if(btnp(2)) then self:erase_blink() player.sysy-=1 end
-	if(btnp(3)) then self:erase_blink() player.sysy+=1 end
-	if(btnp(4)) then update_state() end
-
-	rectfill(8,114,120,120,0)
-	print(self.d[player.sysy][player.sysx].known,9,115,10)
+	if(btnp(0)) then self:erase_blink() self.tgtx-=1 end
+	if(btnp(1)) then self:erase_blink() self.tgtx+=1 end
+	if(btnp(2)) then self:erase_blink() self.tgty-=1 end
+	if(btnp(3)) then self:erase_blink() self.tgty+=1 end
+	if(btnp(4)) then player.sysx=self.tgtx player.sysy=self.tgty update_state() end
 
 	self.blink_timer+=1
 	if(self.blink_timer%10==0) self:blink_cursor()
+	rectfill(8,98,120,120,0)
+	--todo: cache this - this is update()
+	generate_system(player.sysx,player.sysy)
+	print("cur: ("..player.sysx..","..player.sysy..")",10,98,12)
+	print(system_economy_label(),66,98,12)
+	generate_system(self.tgtx,self.tgty)
+	print("tgt: ("..self.tgtx..","..self.tgty..")",10,105,12)
+	if(self.d[self.tgty][self.tgtx].known)then
+		print(system_economy_label(),66,105,12)
+	else
+		print("unknown",66,105,14)
+	end
+	print("cargo: "..cargo_label(),10,112,12)
 end
 
 function states.map:blink_cursor()
 	self.blinked_cursor=not self.blinked_cursor
-	local cx1=self.map_originx+(player.sysx*5)
-	local cy1=self.map_originy+(player.sysy*5)
+	local cx1=self.map_originx+(self.tgtx*5)
+	local cy1=self.map_originy+(self.tgty*5)
 	local cx2=cx1+6
 	local cy2=cy1+6
 	local unaligned_start=cx1%2
@@ -314,6 +331,7 @@ function system:environment_update()
 	if(distance(vec(player.ship.x,player.ship.y),vec(station.x,station.y))<20 and
 			abs(station.angle%1-player.ship.angle%1)<=0.05) then
 		states.map:do_exploration_award()
+		do_trade()
 		update_state()
  end
 	-- if player is within scooping range, scoop fuel dependent on velocity
@@ -407,7 +425,7 @@ end
 -- system
 function system:debug()
 	local ox=0
-	print("score:"..player.score,0,94,7)
+	print("score:"..player.score..' x:'..player.sysx..' y:'..player.sysy,0,94,7)
 	if(player.scooping)then
 		print("scooping",44,64,2)
 	end
@@ -859,6 +877,11 @@ function system_economy()
 	return band(uint_shr(w0,8),0x7)
 end
 
+function system_economy_label()
+	local label={[0]="none","none","none","lo-tech","lo-tech","hi-tech","hi-tech","anarchy"}
+	return label[system_economy()]
+end
+
 function planet_size()
 	-- 3 lowest bits of hsb of w1
  return uint_shr(band(w2,0xf00),8)
@@ -873,6 +896,88 @@ end
 -- placeholder 
 function system_color()
 	return band(0xf,uint_shr(w0,8))
+end
+
+-- trading
+function cargo_label()
+	local cargo_types={[0]="none","lo-tech","hi-tech","contraband","stolen"}
+	return cargo_types[player.cargo] or "miss!"
+end
+
+function do_trade()
+	-- ship size factor, placeholder
+	local ssf=1
+	local cargo_value=0
+	local new_cargo=player.cargo
+	local src='uns'
+	local dest='uns'
+	--local system_economy=system_econy
+	if(player.cargo==0)then --EMPTY
+		if(system_economy()==3 or system_economy()==4)then --LT
+			new_cargo=1
+		end
+		if(system_economy()==5 or system_economy()==6)then --HT
+			new_cargo=2
+		end
+		if(system_economy()==7)then --AN
+			new_cargo=0
+		end
+	end
+	if(player.cargo==1)then --LT
+		src='lt'
+		if(system_economy()==3 or system_economy()==4)then --LT
+			dest='lt'
+			new_cargo=1
+			cargo_value=100
+		end
+		if(system_economy()==5 or system_economy()==6)then --HT
+			dest='ht'
+			new_cargo=2
+			cargo_value=200
+		end
+		if(system_economy()==7)then --AN
+			dest='an'
+			new_cargo=0
+			cargo_value=400
+		end
+	end
+	if(player.cargo==2)then --HT
+		src='ht'
+		if(system_economy()==3 or system_economy()==4)then --LT
+			dest='lt'
+			new_cargo=1
+			cargo_value=200
+		end
+		if(system_economy()==5 or system_economy()==6)then --HT
+			dest='ht'
+			new_cargo=2
+			cargo_value=100
+		end
+		if(system_economy()==7)then --AN
+			dest='an'
+			new_cargo=0
+			cargo_value=400
+		end
+	end
+	--todo: give contraband value when there are cops
+	if(player.cargo==3)then --CON
+		if(system_economy()==3 or system_economy()==4)then --LT
+			new_cargo=1
+			cargo_value=0
+		end
+		if(system_economy()==5 or system_economy()==6)then --HT
+			new_cargo=2
+			cargo_value=0
+		end
+		if(system_economy()==7)then --AN
+			new_cargo=0
+			cargo_value=0
+		end
+	end
+	player.cargo=new_cargo
+	if(cargo_value>0)then
+		add(player.score_items,{"trade "..src.."->"..dest,cargo_value*ssf,8})
+	end
 end
 
 function uint_shr(x,n)
@@ -909,6 +1014,7 @@ function _init()
 	player.sysx=3
 	player.sysy=3
 	player.ship=p
+	player.cargo=0
 	p.player=player
 	for k,v in pairs(states) do v:init() end
 end
