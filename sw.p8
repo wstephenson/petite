@@ -186,11 +186,11 @@ function states.map:update()
 	--todo: cache this - this is update()
 	generate_system(player.sysx,player.sysy)
 	print("cur: ("..player.sysx..","..player.sysy..")",10,98,12)
-	print(system_economy_label(),66,98,12)
+	print(system_economy_label(),66,98,(system_economy()==7) and 8 or 12)
 	generate_system(self.tgtx,self.tgty)
 	print("tgt: ("..self.tgtx..","..self.tgty..")",10,105,12)
 	if(self.d[self.tgty][self.tgtx].known)then
-		print(system_economy_label(),66,105,12)
+		print(system_economy_label(),66,105,(system_economy()==7) and 8 or 12)
 	else
 		print("unknown",66,105,14)
 	end
@@ -476,7 +476,7 @@ function system:draw()
 	end
 	camera()
 	local sc=uint_shr(w1,12)*0.47
-	print('ps:'..planet_size()..',pc:'..planet_color()..',sc:'..sc,10)
+	print('ps:'..planet_size()..',pc:'..planet_color()..',sc:'..sc..',e:'..system_economy(),10)
 	--print("<"..pship.actions[pship.curr_action]..'>',10)
 	self:debug()
 end
@@ -885,8 +885,8 @@ function system_economy()
 end
 
 function system_economy_label()
-	local label={[0]="none","none","none","lo-tech","lo-tech","hi-tech","hi-tech","anarchy"}
-	return label[system_economy()]
+	local label={"none","none","none","lo-tech","lo-tech","hi-tech","hi-tech","anarchy"}
+	return label[system_economy()+1]
 end
 
 function planet_size()
