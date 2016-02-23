@@ -2,6 +2,7 @@ Game loop (in progress)
 
 Player object(persistent over state)
  Ship damage (in progress)
+ Ship death
  Ship fuel (in progress)
  Rank
  Score (done)
@@ -18,7 +19,7 @@ UI for when docked (in progress)
  Ship upgrade
 Galaxy map
  Select next system to jump to (galaxy map) (done)
- Show econ type on map
+ Show econ type on map (done)
 NPC AI
  Pirates that attack you
  Traders that just travel from entry point to station
@@ -31,24 +32,28 @@ Player alignment (like score)
  (-1 to +1 scale based on actions)
  controls ability to dock at stations
 Galaxy map
+ Blank cells for unknown systems
 Procedural system generation, not just random (in progress)
  Planet colour (done)
  Planet size (done)
  Vary palette according to system type (sort of done)
-Hyperjump to a new system (started)
+Hyperjump to a new system (nearly done)
+ Limit jump range 
 Planet/sun/station collisions
 Weapon/health/shield/heat balancing
 Real system scenarios 
-Trading
-Scoring
- UI for showing score items
- Array of score items that are assessed on state change
- Feedback on trading profits
+ Cargo/ore scooping
+Trading (in progrss)
+Scoring (done)
+ UI for showing score items (done)
+ Array of score items that are assessed on state change (done)
+ Feedback on trading profits (done)
 Contraband cargo
-Sort out system coordinate confusion
+Sort out system coordinate confusion (done)
 
 Statistics screen on death
-Start screen/attract mode
+Start screen/attract mode (done)
+SFX
 
 
 Trading engine notes
