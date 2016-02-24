@@ -3,6 +3,7 @@ Game loop (in progress)
 Player object(persistent over state)
  Ship damage (in progress)
  Ship death
+  Animation after death
  Ship fuel (in progress)
  Rank
  Score (done)
@@ -15,7 +16,7 @@ UI for when docked (in progress)
  Switch pages
   XOR cursor (done)
  Trading
- Ship repair
+ Ship repair (in progress)
  Ship upgrade
 Galaxy map
  Select next system to jump to (galaxy map) (done)
