@@ -33,7 +33,7 @@ Player alignment (like score)
  (-1 to +1 scale based on actions)
  controls ability to dock at stations
 Galaxy map
- Blank cells for unknown systems
+ Blank cells for unknown systems (in progress)
 Procedural system generation, not just random (in progress)
  Planet colour (done)
  Planet size (done)
@@ -43,8 +43,8 @@ Hyperjump to a new system (nearly done)
 Planet/sun/station collisions
 Weapon/health/shield/heat balancing
 Real system scenarios 
- Cargo/ore scooping
-Trading (in progrss)
+ Cargo/ore scooping (in progress)
+Trading (in progress)
 Scoring (done)
  UI for showing score items (done)
  Array of score items that are assessed on state change (done)
