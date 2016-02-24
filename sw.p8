@@ -327,13 +327,6 @@ function system:environment_update()
 	local station=self.environment.station
 	local star=self.environment.star
 	station.angle-=0.005
-	-- check for docking
-	if(distance(vec(player.ship.x,player.ship.y),vec(station.x,station.y))<20 and
-			abs(station.angle%1-player.ship.angle%1)<=0.05) then
-		states.map:do_exploration_award()
-		do_trade()
-		update_state()
- end
 	-- if player is within scooping range, scoop fuel dependent on velocity
 	local pship=player.ship
 	local not_scoopable=star.color==1 or star.color==2 or star.color==7
@@ -349,6 +342,13 @@ function system:environment_update()
 	local dist_crit=star.r*stellar_radius_crit
 	local heat_strength=1-clamp((dist_player2star-dist_crit)/(dist_safe-dist_crit),0,1)
 	pship.heat+=heat_star*heat_strength
+	-- check for docking
+	if(distance(vec(player.ship.x,player.ship.y),vec(station.x,station.y))<20 and
+			abs(station.angle%1-player.ship.angle%1)<=0.05) then
+		states.map:do_exploration_award()
+		do_trade()
+		update_state()
+	end
 end
 
 function system:environment_draw()
