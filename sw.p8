@@ -18,6 +18,7 @@ heat_torp=60
 heat_star=10
 dmg_laser=20
 dmg_torp=60
+dmg_collision=30
 fuel_max=10000
 jump_cost=2500
 stellar_radius_scoop_max=1.35
@@ -223,6 +224,7 @@ function system:init()
 	self.lastcx=64
 	self.lastcy=64
 	self.objects={}
+	self.scoopables={}
 	add(self.objects,player.ship)
 	local q=create_ship('k', self)
 	local r=create_ship('s', self)
@@ -270,9 +272,9 @@ function system:update()
 end
 
 function system:populate()
-	local stype='basic'
+	local stype='cans'
 	self.environment={}
-	if(stype=='basic' or stype=='roids') then
+	if(true) then
 	local planet_radius=2+2.5*planet_size()
 	local dwarf_star_scalef=(star_color()==2 or star_color()==7) and 0.33 or 1
 	self.environment = {
@@ -325,6 +327,12 @@ function system:populate()
 			end
 		end)
 	end
+	if(stype=='cans')then
+		for i=1,3 do
+			local can={x=sin(i/3)*12,y=cos(i/3)*12,contents='liquor',value=100}
+			add(self.scoopables,can)
+		end
+	end
 	local entry_body = self.environment.star
 	local entry_angle=0.125
 	player.ship.x=entry_body.x+entry_body.r*1.5*cos(entry_angle)
@@ -351,6 +359,8 @@ function system:environment_update()
 	local dist_crit=star.r*stellar_radius_crit
 	local heat_strength=1-clamp((dist_player2star-dist_crit)/(dist_safe-dist_crit),0,1)
 	pship.heat+=heat_star*heat_strength
+	-- check for object scooping
+	foreach(self.scoopables,check_scooped)
 	-- check for docking
 	if(distance(vec(player.ship.x,player.ship.y),vec(station.x,station.y))<20 and
 			abs(station.angle%1-player.ship.angle%1)<=0.05) then
@@ -374,6 +384,7 @@ function system:environment_draw()
 	if(env.stype=='roids')then
 		foreach(env.roids, function(r) circ(r.x, r.y, r.r, 5) end)
 	end
+	foreach(self.scoopables,function(s)circ(s.x,s.y,3,4) end)
 end
 
 -- system
@@ -420,8 +431,12 @@ function apply_damage(weapon, subject)
 		if(weapon.type=='h')then
 			local excessheat=subject.heat-subject.maxheat
 			dmg=max(0,excessheat)/50
-		else --torp
-			dmg=dmg_torp
+		else
+			if(weapon.type=='c')then --collision
+				dmg=dmg_collision
+			else --torp
+				dmg=dmg_torp
+			end
 		end
 	end
 	local old_shield=subject.shield
@@ -434,7 +449,7 @@ end
 -- system
 function system:debug()
 	local ox=0
-	print("score:"..player.score..' x:'..player.sysx..' y:'..player.sysy,0,94,7)
+	print("score:"..player.score..' x:'..player.ship.x..' y:'..player.ship.y,0,94,7)
 	if(player.scooping)then
 		print("scooping",44,64,2)
 	end
@@ -661,6 +676,22 @@ function system:killed(subject, object)
 	if(object==player.ship)then
 		self.next_state='dead'
 		update_state()
+	end
+end
+
+function check_scooped(o)
+	local pship=player.ship
+	local speed_ok = mysqrt(pship.xv*pship.xv+pship.yv*pship.yv)<(pship.maxv*0.25)
+	if(distance(vec(pship.x,pship.y),vec(o.x,o.y))<10)then
+		if(speed_ok)then
+			--todo: is object in front 90 degrees of ship?
+			--todo: scoop sfx
+			add(player.score_items,{'scooped ['..o.contents..']',o.value, 14})
+		else
+		 make_explosion(vec(o.x,o.y),0,0)
+			apply_damage({type='c'}, pship)
+		end
+		del(system.scoopables,o)
 	end
 end
 
