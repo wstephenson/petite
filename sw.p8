@@ -54,10 +54,6 @@ function states.menu:draw()
 	print("start new cmdr (z/x)",24,109,12)
 end
 
-function states.menu:update()
-	if (btnp(4)) update_state()
-end
-
 function states.score:init()
 	self.next_state="docked"
 	self.display_size=9
@@ -115,10 +111,6 @@ end
 
 function states.docked:draw()
 	draw_ui(self.txt)
-end
-
-function states.docked:update()
-	if (btnp(4)) update_state()
 end
 
 function states.map:init()
@@ -674,10 +666,6 @@ function states.dead:init()
 	self.next_state='menu'
 end
 
-function states.dead:update()
-	if (btnp(4)) update_state()
-end
-
 function states.dead:draw()
 	draw_ui({'you died','score:'..player.score})
 end
@@ -1028,6 +1016,10 @@ function uint_shr(x,n)
 	end
 end
 
+function default_update()
+	if(btnp(4) or btnp(5)) then update_state() end
+end
+
 function _init()
 	srand(666)
 	state="menu"
@@ -1048,7 +1040,12 @@ function _draw()
 end
 
 function _update()
-	states[state]:update()
+	if(not states[state].update)then
+		default_update()
+	else
+		states[state]:update()
+	end
+
 	for p in all(particles) do
 		p.x += p.xv
 		p.y += p.yv
