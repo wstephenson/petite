@@ -98,6 +98,15 @@ end
 
 function states.docked:init()
 	self.next_state="map"
+	local pship=player.ship
+	if(pship.hp<pship.maxhp)then
+		add(player.score_items,{'repair',flr((pship.maxhp-pship.hp)/pship.maxhp*-1000),6})
+		pship.hp=pship.maxhp
+	end
+	if(pship.fuel<fuel_max)then
+		add(player.score_items,{'refuel',flr((fuel_max-pship.fuel)/fuel_max*-100),11})
+		pship.fuel=fuel_max
+	end
 	generate_system(player.sysx,player.sysy)
 	self.txt={"docked",
 			"",
