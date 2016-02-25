@@ -454,14 +454,15 @@ function system:debug()
 	if(player.scooping)then
 		print("scooping",44,64,2)
 	end
-	for o in all(self.objects) do
+	o=player.ship
+	--for o in all(self.objects) do
 		hbar(ox,100,16,5,o.hp,o.maxhp,7,'d:')
 		hbar(ox,106,16,5,o.shield,o.maxshield,12,'s:')
-		hbar(ox,112,16,5,o.timer_shield_recharge,shield_recharge_wait,2,'w:')
-		hbar(ox,118,16,5,o.heat,o.maxheat,8,'h:')
+		--hbar(ox,112,16,5,o.timer_shield_recharge,shield_recharge_wait,2,'w:')
+		hbar(ox,112,16,5,o.heat,o.maxheat,8,'h:')
+		hbar(ox,118,123,3,o.fuel,fuel_max,8,'')
 		ox+=30
-	end
-	hbar(0,123,123,1,player.ship.fuel,fuel_max,8,'')
+	--end
 end
 
 function system:draw()
@@ -493,9 +494,9 @@ function system:draw()
 		line(p.x,p.y,p.x-p.xv,p.y-p.yv,p.ttl > 12 and 10 or (p.ttl > 7 and 9 or 8))
 	end
 	camera()
-	local sc=uint_shr(w1,12)*0.47
-	print('ps:'..planet_size()..',pc:'..planet_color()..',sc:'..sc..',e:'..system_economy(),10)
-	--print("<"..pship.actions[pship.curr_action]..'>',10)
+	--local sc=uint_shr(w1,12)*0.47
+	--print('ps:'..planet_size()..',pc:'..planet_color()..',sc:'..sc..',e:'..system_economy(),10)
+	print("<"..pship.actions[pship.curr_action]..'>',10)
 	self:debug()
 end
 
@@ -1075,8 +1076,9 @@ end
 
 function _init()
 	srand(666)
+	setup_player()
 	state="menu"
-  for k,v in pairs(states) do v:init() end
+ for k,v in pairs(states) do v:init() end
 end
 
 function _draw()
