@@ -46,6 +46,7 @@ states.dead={}
 
 function states.menu:init()
 	self.next_state="docked"
+	setup_player()
 end
 
 function states.menu:draw()
@@ -1060,19 +1061,22 @@ function default_update()
 	if(btnp(4) or btnp(5)) then update_state() end
 end
 
+function setup_player()
+	local p=create_ship('c')
+	player.ship=p
+	player.score=0
+	player.score_items={}
+	player.sysx=3
+	player.sysy=3
+	player.cargo=0
+	p.fuel=fuel_max
+	p.player=player
+end
+
 function _init()
 	srand(666)
 	state="menu"
-	local p=create_ship('c')
-	p.fuel=fuel_max
-	player.score=0
- player.score_items={}
-	player.sysx=3
-	player.sysy=3
-	player.ship=p
-	player.cargo=0
-	p.player=player
-	for k,v in pairs(states) do v:init() end
+  for k,v in pairs(states) do v:init() end
 end
 
 function _draw()
