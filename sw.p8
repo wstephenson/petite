@@ -330,7 +330,11 @@ function system:populate()
 	end
 	if(stype=='cans')then
 		for i=1,3 do
-			local can={x=sin(i/3)*12,y=cos(i/3)*12,contents='liquor',value=100}
+			local can={x=sin(i/3)*12,y=cos(i/3)*12,contents='liquor',value=100,color=4}
+			add(self.scoopables,can)
+		end
+		for i=1,3 do
+			local can={x=sin(i/3+0.5)*12-50,y=cos(i/3+0.5)*12,contents='fuel',value=1000,color=3}
 			add(self.scoopables,can)
 		end
 	end
@@ -385,7 +389,7 @@ function system:environment_draw()
 	if(env.stype=='roids')then
 		foreach(env.roids, function(r) circ(r.x, r.y, r.r, 5) end)
 	end
-	foreach(self.scoopables,function(s)circ(s.x,s.y,3,4) end)
+	foreach(self.scoopables,function(s)circ(s.x,s.y,3,s.color) end)
 end
 
 -- system
@@ -683,7 +687,11 @@ function check_scooped(o)
 		if(speed_ok)then
 			--todo: is object in front 90 degrees of ship?
 			--todo: scoop sfx
-			add(player.score_items,{'scooped ['..o.contents..']',o.value, 14})
+			if(o.contents=='fuel')then
+				pship.fuel=min(pship.fuel+o.value,fuel_max)
+			else
+				add(player.score_items,{'scooped ['..o.contents..']',o.value, 14})
+			end
 		else
 		 make_explosion(vec(o.x,o.y),0,0)
 			apply_damage({type='c'}, pship)
