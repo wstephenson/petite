@@ -66,7 +66,7 @@ end
 function states.score:draw()
 	cls()
 	draw_ui(nil)
-	print("earnings:",46,10,7)
+	print("score:",46,10,7)
 	local count=0
 	-- display last $display_size of the $visible items of $score_items
 	local first=max(1,self.scored-self.display_size+1)
@@ -708,7 +708,7 @@ function states.dead:init()
 end
 
 function states.dead:draw()
-	draw_ui({'you died','score:'..player.score})
+	draw_ui({'you died','','score:'..player.score})
 end
 
 -- utility
