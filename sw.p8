@@ -449,20 +449,16 @@ end
 
 -- system
 function system:debug()
-	local ox=0
-	print("score:"..player.score..' x:'..player.ship.x..' y:'..player.ship.y,0,94,7)
+	local o=player.ship
+	print("score:"..player.score.." <"..o.actions[o.curr_action]..">",0,110,7)
 	if(player.scooping)then
 		print("scooping",44,64,2)
 	end
-	o=player.ship
-	--for o in all(self.objects) do
-		hbar(ox,100,16,5,o.hp,o.maxhp,7,'d:')
-		hbar(ox,106,16,5,o.shield,o.maxshield,12,'s:')
-		--hbar(ox,112,16,5,o.timer_shield_recharge,shield_recharge_wait,2,'w:')
-		hbar(ox,112,16,5,o.heat,o.maxheat,8,'h:')
-		hbar(ox,118,123,3,o.fuel,fuel_max,8,'')
-		ox+=30
-	--end
+	local ox=0
+	hbar(ox,116,16,5,o.hp,o.maxhp,7,'d:')
+	hbar(ox+26,116,16,5,o.shield,o.maxshield,12,'s:')
+	hbar(ox+52,116,16,5,o.heat,o.maxheat,8,'h:')
+	hbar(ox+78,116,16,5,o.fuel,fuel_max,8,'f:')
 end
 
 function system:draw()
@@ -496,7 +492,6 @@ function system:draw()
 	camera()
 	--local sc=uint_shr(w1,12)*0.47
 	--print('ps:'..planet_size()..',pc:'..planet_color()..',sc:'..sc..',e:'..system_economy(),10)
-	print("<"..pship.actions[pship.curr_action]..'>',10)
 	self:debug()
 end
 
