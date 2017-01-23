@@ -160,6 +160,11 @@ function states.map:init()
 	for i=0,galaxy_side-1 do
 		for j=0,galaxy_side-1 do
 			assert(#self.d>0)
+   --jump range indicator
+			if(self:in_range(i,j))then
+				rect(j*5,i*5,j*5+5,i*5+5,11)
+			end
+   --star type
 			if(self.d[i][j].known)then
 				rectfill(j*5+1,i*5+1,j*5+4,i*5+4,self.d[i][j].color)
 			else
@@ -175,7 +180,7 @@ function states.map:update()
 	if(btnp(1)) then self:erase_blink() self.tgtx+=1 end
 	if(btnp(2)) then self:erase_blink() self.tgty-=1 end
 	if(btnp(3)) then self:erase_blink() self.tgty+=1 end
-	if(btnp(4))then -- jump to new system
+	if(self:in_range(self.tgtx,self.tgty) and btnp(4))then
 	 if(not(player.sysx==self.tgtx and player.sysy==self.tgty))then
 			player.sysx=self.tgtx
 			player.sysy=self.tgty
@@ -199,6 +204,9 @@ function states.map:update()
 		print("unknown",66,105,14)
 	end
 	print("cargo: "..cargo_label(),10,112,12)
+	if (not self:in_range(self.tgtx,self.tgty))then
+		print("too far",66,112,8)
+	end
 end
 
 function states.map:blink_cursor()
@@ -214,6 +222,10 @@ end
 
 function states.map:erase_blink()
 	if(self.blinked_cursor) self:blink_cursor()
+end
+
+function states.map:in_range(x,y)
+	return (abs(player.sysx-x)<=1)and(abs(player.sysy-y)<=1)
 end
 
 function states.map:draw()
@@ -1073,6 +1085,7 @@ function setup_player()
 	player.sysx=3
 	player.sysy=3
 	player.cargo=0
+	player.jump_range=1
 	p.fuel=fuel_max
 	p.player=player
 end

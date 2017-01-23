@@ -39,7 +39,7 @@ Procedural system generation, not just random (in progress)
  Planet size (done)
  Vary palette according to system type (sort of done)
 Hyperjump to a new system (nearly done)
- Limit jump range 
+ Limit jump range (done)
 Planet/sun/station collisions
 Weapon/health/shield/heat balancing
 Real system scenarios 
