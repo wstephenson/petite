@@ -2,7 +2,7 @@ Game loop (in progress)
 
 Player object(persistent over state)
  Ship damage (in progress)
- Ship death
+ Ship death (done)
   Animation after death
  Ship fuel (in progress)
  Rank
@@ -31,6 +31,8 @@ Scoring (in progress)
  Scoop score
 Player alignment (like score)
  (-1 to +1 scale based on actions)
+  positive actions
+  negative actions
  controls ability to dock at stations
 Galaxy map
  Blank cells for unknown systems (in progress)
