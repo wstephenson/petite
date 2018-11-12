@@ -1,8 +1,8 @@
 pico-8 cartridge // http://www.pico-8.com
-version 5
+version 14
 __lua__
--- PETITE: TINY CMDR
--- BY WSTEPHENSON
+-- petite: tiny cmdr
+-- by wstephenson
 -- using picoracer-2048 code
 -- vim: set ft=lua ts=1 sw=1 noet:
 player={}
@@ -75,12 +75,12 @@ function states.score:draw()
 	local j=first
 	while j<limit do
 		item=player.score_items[j]
-		string=item[1]..' '..item[2]..'cR'
+		string=item[1]..' '..item[2]..'cr'
 		print(string,10,26+(j-first)*6,item[3])
 		count+=1
 		j+=1
 	end
-	print(player.score.." cR",70,26+6*self.display_size+2,7)
+	print(player.score.." cr",70,26+6*self.display_size+2,7)
 end
 
 function states.score:update()
@@ -981,64 +981,64 @@ function do_trade()
 	local src='uns'
 	local dest='uns'
 	--local system_economy=system_econy
-	if(player.cargo==0)then --EMPTY
-		if(system_economy()==3 or system_economy()==4)then --LT
+	if(player.cargo==0)then --empty
+		if(system_economy()==3 or system_economy()==4)then --lt
 			new_cargo=1
 		end
-		if(system_economy()==5 or system_economy()==6)then --HT
+		if(system_economy()==5 or system_economy()==6)then --ht
 			new_cargo=2
 		end
-		if(system_economy()==7)then --AN
+		if(system_economy()==7)then --an
 			new_cargo=0
 		end
 	end
-	if(player.cargo==1)then --LT
+	if(player.cargo==1)then --lt
 		src='lt'
-		if(system_economy()==3 or system_economy()==4)then --LT
+		if(system_economy()==3 or system_economy()==4)then --lt
 			dest='lt'
 			new_cargo=1
 			cargo_value=100
 		end
-		if(system_economy()==5 or system_economy()==6)then --HT
+		if(system_economy()==5 or system_economy()==6)then --ht
 			dest='ht'
 			new_cargo=2
 			cargo_value=200
 		end
-		if(system_economy()==7)then --AN
+		if(system_economy()==7)then --an
 			dest='an'
 			new_cargo=0
 			cargo_value=400
 		end
 	end
-	if(player.cargo==2)then --HT
+	if(player.cargo==2)then --ht
 		src='ht'
-		if(system_economy()==3 or system_economy()==4)then --LT
+		if(system_economy()==3 or system_economy()==4)then --lt
 			dest='lt'
 			new_cargo=1
 			cargo_value=200
 		end
-		if(system_economy()==5 or system_economy()==6)then --HT
+		if(system_economy()==5 or system_economy()==6)then --ht
 			dest='ht'
 			new_cargo=2
 			cargo_value=100
 		end
-		if(system_economy()==7)then --AN
+		if(system_economy()==7)then --an
 			dest='an'
 			new_cargo=0
 			cargo_value=400
 		end
 	end
 	--todo: give contraband value when there are cops
-	if(player.cargo==3)then --CON
-		if(system_economy()==3 or system_economy()==4)then --LT
+	if(player.cargo==3)then --con
+		if(system_economy()==3 or system_economy()==4)then --lt
 			new_cargo=1
 			cargo_value=0
 		end
-		if(system_economy()==5 or system_economy()==6)then --HT
+		if(system_economy()==5 or system_economy()==6)then --ht
 			new_cargo=2
 			cargo_value=0
 		end
-		if(system_economy()==7)then --AN
+		if(system_economy()==7)then --an
 			new_cargo=0
 			cargo_value=0
 		end
@@ -1120,6 +1120,12 @@ function _update()
 	end
 end
 
+
+-->8
+-- foon
+
+function bar()
+end
 
 __gfx__
 011cc000000000000000000000000000011cc000006c1100006c1100011cc0000000000ccccc000ccccc0ccc000ccc0cc0000ccccc0000000000000000000000
@@ -1250,6 +1256,7 @@ ccccccccccccc000006ccccc00000000000000000000000000000000000000000000c111c000c111
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
 __gff__
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
